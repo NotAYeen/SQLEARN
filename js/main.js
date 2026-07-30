@@ -139,6 +139,22 @@ class App {
                 window.SqlEditor.setValue(level.expected_query);
             }
         });
+
+        // Botones Huérfanos de la Interfaz
+        document.getElementById("btn-settings")?.addEventListener("click", () => {
+            this.showModal(
+                "Ajustes del Sistema", 
+                "¿Deseas formatear la base de datos local y reiniciar tu progreso al Nivel 1?", 
+                () => {
+                    localStorage.removeItem('sql_sim_level');
+                    location.reload();
+                }, 
+                true
+            );
+        });
+        document.getElementById("btn-contact")?.addEventListener("click", () => {
+            this.showModal("Acerca de", "SQL Practice Simulator v1.0\n\nDesarrollado para entrenamiento corporativo y dominio avanzado de bases de datos relacionales.", null, false);
+        });
     }
 
     showModal(title, msg, onConfirm, showCancel = true) {
