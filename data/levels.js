@@ -338,6 +338,243 @@ const LEVELS = [
             { title: "JOIN Masivo", desc: "La base de los sistemas corporativos complejos es saber cómo navegar las relaciones de tabla en tabla usando las Llaves Primarias y Foráneas." },
             { title: "GROUP BY", desc: "Permite consolidar la suma total (SUM) agrupando por un atributo de nivel superior (nombre de cliente)." }
         ]
+        ]
+    },
+    {
+        id_nivel: "escenario_08",
+        db_name: "videojuegos.db",
+        dificultad: "Básico",
+        modalidad: "Auditoría",
+        briefing_mision: "[Videojuegos] Un jugador se queja de que perdió su 'Espada Épica'. Intentamos buscarla, pero la consulta falló por un error de sintaxis en el filtro de texto (las cadenas de texto llevan comillas simples). Haz clic en el token erróneo.",
+        init_db_sql: `
+            CREATE TABLE inventario (
+                id_item INTEGER PRIMARY KEY,
+                jugador TEXT NOT NULL,
+                item TEXT NOT NULL
+            );
+            INSERT INTO inventario (id_item, jugador, item) VALUES (1, 'Hero99', 'Poción'), (2, 'Hero99', 'Espada Épica');
+        `,
+        audit_tokens: ["SELECT ", "* ", "FROM ", "inventario ", "WHERE ", "item = ", "Espada Épica", ";"],
+        token_error_index: 6,
+        explicacion: "Los textos siempre deben ir entre comillas simples en SQL: 'Espada Épica'.",
+        expected_query: "", solution_data: [],
+        schema: [{ table: "inventario", columns: ["id_item (INT)", "jugador (TEXT)", "item (TEXT)"] }],
+        learning_resources: [{ title: "Comillas simples", desc: "El texto en SQL siempre debe estar rodeado de comillas simples ('texto')." }]
+    },
+    {
+        id_nivel: "escenario_09",
+        db_name: "restaurante.db",
+        dificultad: "Intermedio",
+        modalidad: "Auditoría",
+        briefing_mision: "[Restaurante] El sistema de órdenes falló. Un programador usó una palabra reservada ('table') como nombre para la tabla de mesas del restaurante. Encuentra y haz clic en el error.",
+        init_db_sql: `
+            CREATE TABLE mesas (
+                id_mesa INTEGER PRIMARY KEY,
+                capacidad INTEGER NOT NULL
+            );
+        `,
+        audit_tokens: ["SELECT ", "* ", "FROM ", "table ", "WHERE ", "capacidad > 2;"],
+        token_error_index: 3,
+        explicacion: "No puedes nombrar a una tabla con palabras reservadas del sistema SQL como 'table', 'select', 'where', etc. (Se llamó 'mesas' en la BD real).",
+        expected_query: "", solution_data: [],
+        schema: [{ table: "mesas", columns: ["id_mesa (INT)", "capacidad (INT)"] }],
+        learning_resources: [{ title: "Palabras Reservadas", desc: "Evita nombrar tus tablas o columnas con comandos de SQL." }]
+    },
+    {
+        id_nivel: "escenario_10",
+        db_name: "red_social.db",
+        dificultad: "Intermedio",
+        modalidad: "Ensamblaje",
+        briefing_mision: "[Red Social] Un usuario nuevo se ha registrado. Ensambla los bloques para INSERTAR al usuario 'bob' y luego SELECCIONARLO para verificar.",
+        init_db_sql: `
+            CREATE TABLE usuarios (
+                username TEXT PRIMARY KEY,
+                seguidores INTEGER
+            );
+            INSERT INTO usuarios (username, seguidores) VALUES ('alice', 500);
+        `,
+        dnd_blocks: ["INSERT INTO usuarios", "(username, seguidores) VALUES ('bob', 0);", "SELECT username", "FROM usuarios WHERE username = 'bob';"],
+        expected_query: "INSERT INTO usuarios (username, seguidores) VALUES ('bob', 0); SELECT username FROM usuarios WHERE username = 'bob';",
+        solution_data: [['bob']],
+        schema: [{ table: "usuarios", columns: ["username (TEXT)", "seguidores (INT)"] }],
+        learning_resources: [{ title: "INSERT INTO", desc: "Agrega nuevas filas. Se suele seguir de (columnas) VALUES (valores)." }]
+    },
+    {
+        id_nivel: "escenario_11",
+        db_name: "vuelos.db",
+        dificultad: "Intermedio",
+        modalidad: "Ensamblaje",
+        briefing_mision: "[Vuelos] Forma un JOIN correcto para ver qué pasajero va en qué vuelo.",
+        init_db_sql: `
+            CREATE TABLE pasajeros (id_pasajero INT, nombre TEXT);
+            CREATE TABLE vuelos (id_vuelo INT, id_pasajero INT, destino TEXT);
+            INSERT INTO pasajeros VALUES (1, 'Carlos'), (2, 'Ana');
+            INSERT INTO vuelos VALUES (100, 1, 'Paris'), (101, 2, 'Roma');
+        `,
+        dnd_blocks: ["SELECT pasajeros.nombre, vuelos.destino", "FROM pasajeros", "INNER JOIN vuelos", "ON pasajeros.id_pasajero = vuelos.id_pasajero;"],
+        expected_query: "SELECT pasajeros.nombre, vuelos.destino FROM pasajeros INNER JOIN vuelos ON pasajeros.id_pasajero = vuelos.id_pasajero;",
+        solution_data: [['Carlos', 'Paris'], ['Ana', 'Roma']],
+        schema: [{ table: "pasajeros", columns: ["id_pasajero (INT)", "nombre (TEXT)"] }, { table: "vuelos", columns: ["id_vuelo (INT)", "id_pasajero (INT)", "destino (TEXT)"] }],
+        learning_resources: [{ title: "INNER JOIN", desc: "La estructura básica es: FROM tabla1 INNER JOIN tabla2 ON tabla1.id = tabla2.id" }]
+    },
+    {
+        id_nivel: "escenario_12",
+        db_name: "biblioteca.db",
+        dificultad: "Intermedio",
+        modalidad: "Depuración",
+        briefing_mision: "[Biblioteca] La búsqueda de libros no funciona. Queremos encontrar cualquier libro que contenga la palabra 'Magia' en su título, pero los comodines '%' del LIKE están mal puestos. ¡Arréglalo!",
+        init_db_sql: `
+            CREATE TABLE libros (id INT, titulo TEXT);
+            INSERT INTO libros VALUES (1, 'La Magia Oscura'), (2, 'Matemáticas Básicas'), (3, 'Trucos de Magia'), (4, 'Historia Universal');
+        `,
+        query_defectuoso: "SELECT titulo FROM libros WHERE titulo LIKE 'Magia%';",
+        expected_query: "SELECT titulo FROM libros WHERE titulo LIKE '%Magia%';",
+        solution_data: [['La Magia Oscura'], ['Trucos de Magia']],
+        schema: [{ table: "libros", columns: ["id (INT)", "titulo (TEXT)"] }],
+        learning_resources: [{ title: "LIKE", desc: "El comodín % reemplaza cualquier cantidad de caracteres. '%Texto%' busca 'Texto' en cualquier parte." }]
+    },
+    {
+        id_nivel: "escenario_13",
+        db_name: "concesionario.db",
+        dificultad: "Avanzado",
+        modalidad: "Depuración",
+        briefing_mision: "[Concesionario] Queremos ver el precio promedio (AVG) de los autos por cada marca. La consulta da error porque olvidaron agrupar los resultados. ¡Añade la cláusula faltante al final!",
+        init_db_sql: `
+            CREATE TABLE autos (id INT, marca TEXT, precio INT);
+            INSERT INTO autos VALUES (1, 'Ford', 20000), (2, 'Ford', 25000), (3, 'Toyota', 22000), (4, 'Toyota', 24000);
+        `,
+        query_defectuoso: "SELECT marca, AVG(precio) FROM autos;",
+        expected_query: "SELECT marca, AVG(precio) FROM autos GROUP BY marca;",
+        solution_data: [['Ford', 22500], ['Toyota', 23000]],
+        schema: [{ table: "autos", columns: ["id (INT)", "marca (TEXT)", "precio (INT)"] }],
+        learning_resources: [{ title: "Funciones de Agregación", desc: "Siempre que uses AVG, SUM o COUNT junto con otras columnas, DEBES agrupar (GROUP BY) por esas otras columnas." }]
+    },
+    {
+        id_nivel: "escenario_14",
+        db_name: "gimnasio.db",
+        dificultad: "Intermedio",
+        modalidad: "Terminal",
+        briefing_mision: "[Gimnasio] Extrae el 'nombre' de los clientes que tengan estado 'Activo' y ordénalos alfabéticamente de forma descendente (Z a A).",
+        init_db_sql: `
+            CREATE TABLE clientes (id INT, nombre TEXT, estado TEXT);
+            INSERT INTO clientes VALUES (1, 'Zack', 'Activo'), (2, 'Ana', 'Inactivo'), (3, 'Xavier', 'Activo'), (4, 'Beto', 'Activo');
+        `,
+        expected_query: "SELECT nombre FROM clientes WHERE estado = 'Activo' ORDER BY nombre DESC;",
+        solution_data: [['Zack'], ['Xavier'], ['Beto']],
+        schema: [{ table: "clientes", columns: ["id (INT)", "nombre (TEXT)", "estado (TEXT)"] }],
+        learning_resources: [{ title: "ORDER BY DESC", desc: "El orden predeterminado es ASC. Usa DESC para invertirlo." }]
+    },
+    {
+        id_nivel: "escenario_15",
+        db_name: "universidad.db",
+        dificultad: "Experto",
+        modalidad: "Terminal",
+        briefing_mision: "[Universidad] Jefe Final 2: Subconsultas. Selecciona el 'nombre' de los alumnos cuya 'calificacion' sea MAYOR al promedio general de todos los alumnos. (Pista: usa WHERE calificacion > (SELECT AVG(calificacion) FROM alumnos) ).",
+        init_db_sql: `
+            CREATE TABLE alumnos (id INT, nombre TEXT, calificacion INT);
+            INSERT INTO alumnos VALUES (1, 'Luis', 6), (2, 'Marta', 9), (3, 'Pedro', 7), (4, 'Julia', 10);
+        `,
+        expected_query: "SELECT nombre FROM alumnos WHERE calificacion > (SELECT AVG(calificacion) FROM alumnos);",
+        solution_data: [['Marta'], ['Julia']],
+        schema: [{ table: "alumnos", columns: ["id (INT)", "nombre (TEXT)", "calificacion (INT)"] }],
+        learning_resources: [{ title: "Subconsultas", desc: "Puedes anidar consultas dentro de paréntesis para usar sus resultados como valores dinámicos en tu WHERE." }]
+    },
+    {
+        id_nivel: "escenario_16", db_name: "rrhh_filtros.db", dificultad: "Intermedio", modalidad: "Terminal",
+        briefing_mision: "[RRHH Filtros] Selecciona el 'nombre' de los empleados cuyo departamento esté en la lista ('IT', 'Ventas') y cuyo salario esté entre 3000 y 5000.",
+        init_db_sql: "CREATE TABLE empleados (nombre TEXT, depto TEXT, salario INT); INSERT INTO empleados VALUES ('Ana', 'IT', 4000), ('Beto', 'Ventas', 2000), ('Cris', 'IT', 6000), ('Dany', 'Ventas', 4500);",
+        expected_query: "SELECT nombre FROM empleados WHERE depto IN ('IT', 'Ventas') AND salario BETWEEN 3000 AND 5000;",
+        solution_data: [['Ana'], ['Dany']],
+        schema: [{ table: "empleados", columns: ["nombre (TEXT)", "depto (TEXT)", "salario (INT)"] }],
+        learning_resources: [{ title: "IN y BETWEEN", desc: "Usa IN ('a', 'b') para listas y BETWEEN x AND y para rangos inclusivos." }]
+    },
+    {
+        id_nivel: "escenario_17", db_name: "soporte_it.db", dificultad: "Intermedio", modalidad: "Depuración",
+        briefing_mision: "[Soporte IT] La consulta intenta mostrar el ticket y quién lo atiende. Si el asignado es nulo, debe decir 'Sin Asignar'. Arregla la función COALESCE (recibe dos parámetros).",
+        init_db_sql: "CREATE TABLE tickets (id INT, asignado TEXT); INSERT INTO tickets VALUES (1, 'Admin'), (2, NULL);",
+        query_defectuoso: "SELECT id, COALESCE(asignado) FROM tickets;",
+        expected_query: "SELECT id, COALESCE(asignado, 'Sin Asignar') FROM tickets;",
+        solution_data: [[1, 'Admin'], [2, 'Sin Asignar']],
+        schema: [{ table: "tickets", columns: ["id (INT)", "asignado (TEXT)"] }],
+        learning_resources: [{ title: "COALESCE", desc: "Devuelve el primer valor que no sea nulo en la lista: COALESCE(columna, 'Valor por defecto')." }]
+    },
+    {
+        id_nivel: "escenario_18", db_name: "contabilidad.db", dificultad: "Avanzado", modalidad: "Ensamblaje",
+        briefing_mision: "[Contabilidad] Ensambla la consulta para calcular el precio final con impuesto (precio * 1.16) y redondéalo a 1 decimal.",
+        init_db_sql: "CREATE TABLE productos (nombre TEXT, precio REAL); INSERT INTO productos VALUES ('Mouse', 10.55), ('Teclado', 20.1);",
+        dnd_blocks: ["SELECT nombre,", "ROUND(", "precio * 1.16", ", 1)", "FROM productos;"],
+        expected_query: "SELECT nombre, ROUND( precio * 1.16 , 1) FROM productos;",
+        solution_data: [['Mouse', 12.2], ['Teclado', 23.3]],
+        schema: [{ table: "productos", columns: ["nombre (TEXT)", "precio (REAL)"] }],
+        learning_resources: [{ title: "Matemáticas y ROUND", desc: "Puedes usar *, /, +, - directamente. ROUND(valor, decimales) redondea el número." }]
+    },
+    {
+        id_nivel: "escenario_19", db_name: "directorio.db", dificultad: "Avanzado", modalidad: "Terminal",
+        briefing_mision: "[Directorio] Concatena nombre y apellido con un espacio entre ellos ('nombre || \\' \\' || apellido') y conviértelo a MAYÚSCULAS usando UPPER(). Extrae solo eso.",
+        init_db_sql: "CREATE TABLE gente (nombre TEXT, apellido TEXT); INSERT INTO gente VALUES ('john', 'doe'), ('jane', 'smith');",
+        expected_query: "SELECT UPPER(nombre || ' ' || apellido) FROM gente;",
+        solution_data: [['JOHN DOE'], ['JANE SMITH']],
+        schema: [{ table: "gente", columns: ["nombre (TEXT)", "apellido (TEXT)"] }],
+        learning_resources: [{ title: "Operadores de Texto", desc: "|| une textos (en SQLite). UPPER() los hace mayúsculas, LOWER() minúsculas." }]
+    },
+    {
+        id_nivel: "escenario_20", db_name: "calificaciones.db", dificultad: "Avanzado", modalidad: "Depuración",
+        briefing_mision: "[Calificaciones] Corrige la sintaxis del CASE WHEN. Falta la palabra clave que cierra y finaliza el bloque lógico.",
+        init_db_sql: "CREATE TABLE notas (alumno TEXT, nota INT); INSERT INTO notas VALUES ('Leo', 90), ('Mia', 50);",
+        query_defectuoso: "SELECT alumno, CASE WHEN nota >= 60 THEN 'Aprobado' ELSE 'Reprobado' FROM notas;",
+        expected_query: "SELECT alumno, CASE WHEN nota >= 60 THEN 'Aprobado' ELSE 'Reprobado' END FROM notas;",
+        solution_data: [['Leo', 'Aprobado'], ['Mia', 'Reprobado']],
+        schema: [{ table: "notas", columns: ["alumno (TEXT)", "nota (INT)"] }],
+        learning_resources: [{ title: "CASE WHEN", desc: "Estructura: CASE WHEN condicion THEN resultado ELSE alternativo END" }]
+    },
+    {
+        id_nivel: "escenario_21", db_name: "inventario_bodega.db", dificultad: "Intermedio", modalidad: "Auditoría",
+        briefing_mision: "[Bodega] Se intenta calcular la suma total (SUM) de inventario, pero por error usaron la función para contar (COUNT). Encuentra el error.",
+        init_db_sql: "CREATE TABLE items (nombre TEXT, cantidad INT); INSERT INTO items VALUES ('A', 10), ('B', 20);",
+        audit_tokens: ["SELECT ", "COUNT", "(cantidad) ", "FROM ", "items;"],
+        token_error_index: 1,
+        explicacion: "COUNT() cuenta filas. SUM() suma los valores numéricos.",
+        expected_query: "", solution_data: [],
+        schema: [{ table: "items", columns: ["nombre (TEXT)", "cantidad (INT)"] }],
+        learning_resources: [{ title: "COUNT vs SUM", desc: "COUNT cuenta la cantidad de registros. SUM suma el valor matemático de la columna." }]
+    },
+    {
+        id_nivel: "escenario_22", db_name: "fusiones.db", dificultad: "Avanzado", modalidad: "Ensamblaje",
+        briefing_mision: "[Fusiones] Arrastra los bloques para UNIR los correos de la tabla 'empresa_a' con los de 'empresa_b', excluyendo duplicados.",
+        init_db_sql: "CREATE TABLE empresa_a (correo TEXT); CREATE TABLE empresa_b (correo TEXT); INSERT INTO empresa_a VALUES ('a@mail.com'), ('dup@mail.com'); INSERT INTO empresa_b VALUES ('b@mail.com'), ('dup@mail.com');",
+        dnd_blocks: ["SELECT correo FROM empresa_a", "UNION", "SELECT correo FROM empresa_b", ";"],
+        expected_query: "SELECT correo FROM empresa_a UNION SELECT correo FROM empresa_b ;",
+        solution_data: [['a@mail.com'], ['b@mail.com'], ['dup@mail.com']],
+        schema: [{ table: "empresa_a", columns: ["correo (TEXT)"] }, { table: "empresa_b", columns: ["correo (TEXT)"] }],
+        learning_resources: [{ title: "UNION vs UNION ALL", desc: "UNION combina resultados eliminando duplicados. UNION ALL los deja intactos." }]
+    },
+    {
+        id_nivel: "escenario_23", db_name: "suscripciones.db", dificultad: "Experto", modalidad: "Terminal",
+        briefing_mision: "[Suscripciones] Lista 'nombre' del cliente y su 'plan' de suscripción. Usa LEFT JOIN para que los clientes SIN suscripción también aparezcan (su plan se mostrará vacío).",
+        init_db_sql: "CREATE TABLE cl (id INT, nombre TEXT); CREATE TABLE sub (id_cl INT, plan TEXT); INSERT INTO cl VALUES (1, 'Sam'), (2, 'Tim'); INSERT INTO sub VALUES (1, 'Pro');",
+        expected_query: "SELECT cl.nombre, sub.plan FROM cl LEFT JOIN sub ON cl.id = sub.id_cl;",
+        solution_data: [['Sam', 'Pro'], ['Tim', null]],
+        schema: [{ table: "cl", columns: ["id (INT)", "nombre (TEXT)"] }, { table: "sub", columns: ["id_cl (INT)", "plan (TEXT)"] }],
+        learning_resources: [{ title: "LEFT JOIN", desc: "Mantiene TODAS las filas de la tabla izquierda, y rellena con NULL donde no hay match a la derecha." }]
+    },
+    {
+        id_nivel: "escenario_24", db_name: "hoteles.db", dificultad: "Experto", modalidad: "Depuración",
+        briefing_mision: "[Hoteles] Busca las reservas que ocurran HOY o en el futuro. Debes reemplazar 'HOY' por la función DATE('now') para obtener la fecha actual dinámica del sistema.",
+        init_db_sql: "CREATE TABLE reservas (habitacion INT, fecha TEXT); INSERT INTO reservas VALUES (101, '2010-12-31'), (102, '2050-05-10');",
+        query_defectuoso: "SELECT habitacion FROM reservas WHERE fecha >= 'HOY';",
+        expected_query: "SELECT habitacion FROM reservas WHERE fecha >= DATE('now');",
+        solution_data: [[102]],
+        schema: [{ table: "reservas", columns: ["habitacion (INT)", "fecha (TEXT)"] }],
+        learning_resources: [{ title: "Funciones de Fecha", desc: "DATE('now') devuelve la fecha del día de hoy para comparaciones dinámicas." }]
+    },
+    {
+        id_nivel: "escenario_25", db_name: "seguridad_nsa.db", dificultad: "Experto", modalidad: "Terminal",
+        briefing_mision: "[NSA] Jefe Final Absoluto. Extrae la 'ip' de los accesos donde NOT EXISTS un registro en la tabla de 'autorizados' que tenga la misma IP.",
+        init_db_sql: "CREATE TABLE accesos (ip TEXT); CREATE TABLE autorizados (ip TEXT); INSERT INTO accesos VALUES ('1.1.1.1'), ('9.9.9.9'); INSERT INTO autorizados VALUES ('1.1.1.1');",
+        expected_query: "SELECT ip FROM accesos WHERE NOT EXISTS (SELECT 1 FROM autorizados WHERE autorizados.ip = accesos.ip);",
+        solution_data: [['9.9.9.9']],
+        schema: [{ table: "accesos", columns: ["ip (TEXT)"] }, { table: "autorizados", columns: ["ip (TEXT)"] }],
+        learning_resources: [{ title: "NOT EXISTS", desc: "WHERE NOT EXISTS (subconsulta) filtra registros donde la subconsulta correlacionada no arroje ni un solo resultado." }]
     }
 ];
 
