@@ -1,0 +1,36 @@
+{
+    "id_nivel": "escenario_13",
+    "db_name": "concesionario.db",
+    "dificultad": "Avanzado",
+    "modalidad": "Depuración",
+    "briefing_mision": "[Concesionario] Queremos ver el precio promedio (AVG) de los autos por cada marca. La consulta da error porque olvidaron agrupar los resultados. ¡Añade la cláusula faltante al final!",
+    "init_db_sql": "\n            CREATE TABLE autos (id INT, marca TEXT, precio INT);\n            INSERT INTO autos VALUES (1, 'Ford', 20000), (2, 'Ford', 25000), (3, 'Toyota', 22000), (4, 'Toyota', 24000);\n        ",
+    "query_defectuoso": "SELECT marca, AVG(precio) FROM autos;",
+    "expected_query": "SELECT marca, AVG(precio) FROM autos GROUP BY marca;",
+    "solution_data": [
+        [
+            "Ford",
+            22500
+        ],
+        [
+            "Toyota",
+            23000
+        ]
+    ],
+    "schema": [
+        {
+            "table": "autos",
+            "columns": [
+                "id (INT)",
+                "marca (TEXT)",
+                "precio (INT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "Funciones de Agregación",
+            "desc": "Siempre que uses AVG, SUM o COUNT junto con otras columnas, DEBES agrupar (GROUP BY) por esas otras columnas."
+        }
+    ]
+}

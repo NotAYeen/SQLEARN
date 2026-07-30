@@ -1,0 +1,41 @@
+{
+    "id_nivel": "escenario_18",
+    "db_name": "contabilidad.db",
+    "dificultad": "Avanzado",
+    "modalidad": "Ensamblaje",
+    "briefing_mision": "[Contabilidad] Ensambla la consulta para calcular el precio final con impuesto (precio * 1.16) y redondéalo a 1 decimal.",
+    "init_db_sql": "CREATE TABLE productos (nombre TEXT, precio REAL); INSERT INTO productos VALUES ('Mouse', 10.55), ('Teclado', 20.1);",
+    "dnd_blocks": [
+        "SELECT nombre,",
+        "ROUND(",
+        "precio * 1.16",
+        ", 1)",
+        "FROM productos;"
+    ],
+    "expected_query": "SELECT nombre, ROUND( precio * 1.16 , 1) FROM productos;",
+    "solution_data": [
+        [
+            "Mouse",
+            12.2
+        ],
+        [
+            "Teclado",
+            23.3
+        ]
+    ],
+    "schema": [
+        {
+            "table": "productos",
+            "columns": [
+                "nombre (TEXT)",
+                "precio (REAL)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "Matemáticas y ROUND",
+            "desc": "Puedes usar *, /, +, - directamente. ROUND(valor, decimales) redondea el número."
+        }
+    ]
+}

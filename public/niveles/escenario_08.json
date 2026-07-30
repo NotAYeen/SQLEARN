@@ -1,0 +1,38 @@
+{
+    "id_nivel": "escenario_08",
+    "db_name": "videojuegos.db",
+    "dificultad": "Básico",
+    "modalidad": "Auditoría",
+    "briefing_mision": "[Videojuegos] Un jugador se queja de que perdió su 'Espada Épica'. Intentamos buscarla, pero la consulta falló por un error de sintaxis en el filtro de texto (las cadenas de texto llevan comillas simples). Haz clic en el token erróneo.",
+    "init_db_sql": "\n            CREATE TABLE inventario (\n                id_item INTEGER PRIMARY KEY,\n                jugador TEXT NOT NULL,\n                item TEXT NOT NULL\n            );\n            INSERT INTO inventario (id_item, jugador, item) VALUES (1, 'Hero99', 'Poción'), (2, 'Hero99', 'Espada Épica');\n        ",
+    "audit_tokens": [
+        "SELECT ",
+        "* ",
+        "FROM ",
+        "inventario ",
+        "WHERE ",
+        "item = ",
+        "Espada Épica",
+        ";"
+    ],
+    "token_error_index": 6,
+    "explicacion": "Los textos siempre deben ir entre comillas simples en SQL: 'Espada Épica'.",
+    "expected_query": "",
+    "solution_data": [],
+    "schema": [
+        {
+            "table": "inventario",
+            "columns": [
+                "id_item (INT)",
+                "jugador (TEXT)",
+                "item (TEXT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "Comillas simples",
+            "desc": "El texto en SQL siempre debe estar rodeado de comillas simples ('texto')."
+        }
+    ]
+}

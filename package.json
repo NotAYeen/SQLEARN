@@ -1,0 +1,19 @@
+{
+  "name": "sqlgithub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "sortablejs": "^1.15.7",
+    "vite": "^8.1.5"
+  }
+}
