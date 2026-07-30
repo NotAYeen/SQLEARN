@@ -218,8 +218,6 @@ body {
     border: 2px solid;
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
     margin: 4px;
-    overflow-y: auto;
-    max-height: 250px;
 }
 [data-theme="dark"] .schema-list {
     background-color: #1a1a1a;
