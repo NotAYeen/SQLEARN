@@ -338,7 +338,6 @@ const LEVELS = [
             { title: "JOIN Masivo", desc: "La base de los sistemas corporativos complejos es saber cómo navegar las relaciones de tabla en tabla usando las Llaves Primarias y Foráneas." },
             { title: "GROUP BY", desc: "Permite consolidar la suma total (SUM) agrupando por un atributo de nivel superior (nombre de cliente)." }
         ]
-        ]
     },
     {
         id_nivel: "escenario_08",
