@@ -209,8 +209,7 @@ export class App {
         if (briefing) {
             briefing.innerHTML = `
                 <h2 style="margin-bottom:8px;">Misión ${index + 1}: ${level.db_name || ''}</h2>
-                <p style="font-size:14px; line-height:1.5;">${level.descripcion}</p>
-                <p style="font-size:13px; color:#666; margin-top:8px;"><strong>Objetivo:</strong> ${level.objetivo}</p>
+                <p style="font-size:14px; line-height:1.5;">${level.briefing_mision}</p>
             `;
         }
 
@@ -333,6 +332,9 @@ export class App {
     }
 
     renderResults(res) {
+        document.getElementById("results-placeholder").style.display = "none";
+        document.getElementById("results-content").style.display = "block";
+
         const table = document.getElementById("results-table");
         table.innerHTML = "";
 
