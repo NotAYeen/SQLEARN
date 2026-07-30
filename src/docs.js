@@ -48,4 +48,5 @@ export const SqlDocs = [
             { name: "CASE WHEN", desc: "Estructura algorítmica para evaluar condiciones y devolver un resultado. Es el equivalente a 'if/else'.", example: "CASE WHEN nota >= 6 THEN 'Pasa' ELSE 'Falla' END" },
             { name: "DATE()", desc: "Extrae o da formato de fecha a un string. `DATE('now')` devuelve la fecha actual del sistema.", example: "SELECT DATE('now');" }
         ]
+    }
 ];

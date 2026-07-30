@@ -153,7 +153,7 @@ export class App {
             const containerOffset = leftPanel.parentElement.getBoundingClientRect().left;
             const newWidth = e.clientX - containerOffset;
             if (newWidth > 200 && newWidth < window.innerWidth - 300) {
-                leftPanel.style.flex = \`0 0 \${newWidth}px\`;
+                leftPanel.style.flex = `0 0 ${newWidth}px`;
             }
         });
 
@@ -182,7 +182,7 @@ export class App {
             category.items.forEach(item => {
                 const li = document.createElement("li");
                 li.className = "schema-column";
-                li.innerHTML = \`<i class="ph-fill ph-book-open"></i> \${item.name}\`;
+                li.innerHTML = `<i class="ph-fill ph-book-open"></i> ${item.name}`;
                 li.addEventListener("click", () => this.winManager.showDoc(item));
                 docsList.appendChild(li);
             });
@@ -220,7 +220,7 @@ export class App {
         } else {
             document.getElementById("editor-container").style.display = "block";
             document.getElementById("btn-run").style.display = "inline-flex";
-            const savedCode = localStorage.getItem(\`sql_sim_code_\${index}\`);
+            const savedCode = localStorage.getItem(`sql_sim_code_${index}`);
             if (savedCode) {
                 this.editor.setValue(savedCode);
             } else {
@@ -238,7 +238,7 @@ export class App {
         list.innerHTML = "";
         schema.forEach(tbl => {
             const li = document.createElement("li");
-            li.innerHTML = \`<div class="schema-table-name"><i class="ph-fill ph-table"></i> \${tbl.table}</div>\`;
+            li.innerHTML = `<div class="schema-table-name"><i class="ph-fill ph-table"></i> ${tbl.table}</div>`;
             
             const colList = document.createElement("ul");
             colList.className = "schema-list";
@@ -247,7 +247,7 @@ export class App {
             tbl.columns.forEach(col => {
                 const cli = document.createElement("li");
                 cli.className = "schema-column";
-                cli.innerHTML = \`<i class="ph-fill ph-columns"></i> \${col}\`;
+                cli.innerHTML = `<i class="ph-fill ph-columns"></i> ${col}`;
                 colList.appendChild(cli);
             });
             
@@ -265,10 +265,10 @@ export class App {
             li.className = "schema-column";
             li.style.flexDirection = "column";
             li.style.alignItems = "flex-start";
-            li.innerHTML = \`
-                <div style="font-weight:bold; margin-bottom:4px;"><i class="ph-fill ph-lightbulb"></i> \${res.title}</div>
-                <div style="font-size: 11px; line-height: 1.3;">\${res.desc}</div>
-            \`;
+            li.innerHTML = `
+                <div style="font-weight:bold; margin-bottom:4px;"><i class="ph-fill ph-lightbulb"></i> ${res.title}</div>
+                <div style="font-size: 11px; line-height: 1.3;">${res.desc}</div>
+            `;
             list.appendChild(li);
         });
     }

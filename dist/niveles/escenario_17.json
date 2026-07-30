@@ -1,0 +1,35 @@
+{
+    "id_nivel": "escenario_17",
+    "db_name": "soporte_it.db",
+    "dificultad": "Intermedio",
+    "modalidad": "Depuración",
+    "briefing_mision": "[Soporte IT] La consulta intenta mostrar el ticket y quién lo atiende. Si el asignado es nulo, debe decir 'Sin Asignar'. Arregla la función COALESCE (recibe dos parámetros).",
+    "init_db_sql": "CREATE TABLE tickets (id INT, asignado TEXT); INSERT INTO tickets VALUES (1, 'Admin'), (2, NULL);",
+    "query_defectuoso": "SELECT id, COALESCE(asignado) FROM tickets;",
+    "expected_query": "SELECT id, COALESCE(asignado, 'Sin Asignar') FROM tickets;",
+    "solution_data": [
+        [
+            1,
+            "Admin"
+        ],
+        [
+            2,
+            "Sin Asignar"
+        ]
+    ],
+    "schema": [
+        {
+            "table": "tickets",
+            "columns": [
+                "id (INT)",
+                "asignado (TEXT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "COALESCE",
+            "desc": "Devuelve el primer valor que no sea nulo en la lista: COALESCE(columna, 'Valor por defecto')."
+        }
+    ]
+}

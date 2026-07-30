@@ -1,0 +1,48 @@
+{
+    "id_nivel": "escenario_01",
+    "db_name": "techcorp.db",
+    "dificultad": "Básico",
+    "modalidad": "Terminal",
+    "briefing_mision": "[RRHH y Nóminas] Necesitamos revisar la lista de empleados de la empresa 'TechCorp'. Escribe una consulta para seleccionar el 'nombre' y 'salario' de la tabla 'empleados' donde el departamento ('depto') sea 'IT'.",
+    "init_db_sql": "\n            CREATE TABLE empleados (\n                id INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL,\n                depto TEXT NOT NULL,\n                salario INTEGER NOT NULL\n            );\n            INSERT INTO empleados (id, nombre, depto, salario) VALUES \n            (1, 'Laura G.', 'IT', 4500),\n            (2, 'Roberto M.', 'Ventas', 3200),\n            (3, 'Carla T.', 'IT', 4700),\n            (4, 'Sofia R.', 'Marketing', 3000),\n            (5, 'Diego P.', 'IT', 4200);\n        ",
+    "expected_query": "SELECT nombre, salario FROM empleados WHERE depto = 'IT';",
+    "solution_data": [
+        [
+            "Laura G.",
+            4500
+        ],
+        [
+            "Carla T.",
+            4700
+        ],
+        [
+            "Diego P.",
+            4200
+        ]
+    ],
+    "schema": [
+        {
+            "table": "empleados",
+            "columns": [
+                "id (INT)",
+                "nombre (TEXT)",
+                "depto (TEXT)",
+                "salario (INT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "SELECT",
+            "desc": "Selecciona las columnas que quieres visualizar de la base de datos."
+        },
+        {
+            "title": "FROM",
+            "desc": "Especifica la tabla de la cual vas a extraer los datos."
+        },
+        {
+            "title": "WHERE",
+            "desc": "Filtra los resultados para mostrar sólo los que cumplan la condición."
+        }
+    ]
+}

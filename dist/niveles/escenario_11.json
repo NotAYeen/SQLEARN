@@ -1,0 +1,48 @@
+{
+    "id_nivel": "escenario_11",
+    "db_name": "vuelos.db",
+    "dificultad": "Intermedio",
+    "modalidad": "Ensamblaje",
+    "briefing_mision": "[Vuelos] Forma un JOIN correcto para ver qué pasajero va en qué vuelo.",
+    "init_db_sql": "\n            CREATE TABLE pasajeros (id_pasajero INT, nombre TEXT);\n            CREATE TABLE vuelos (id_vuelo INT, id_pasajero INT, destino TEXT);\n            INSERT INTO pasajeros VALUES (1, 'Carlos'), (2, 'Ana');\n            INSERT INTO vuelos VALUES (100, 1, 'Paris'), (101, 2, 'Roma');\n        ",
+    "dnd_blocks": [
+        "SELECT pasajeros.nombre, vuelos.destino",
+        "FROM pasajeros",
+        "INNER JOIN vuelos",
+        "ON pasajeros.id_pasajero = vuelos.id_pasajero;"
+    ],
+    "expected_query": "SELECT pasajeros.nombre, vuelos.destino FROM pasajeros INNER JOIN vuelos ON pasajeros.id_pasajero = vuelos.id_pasajero;",
+    "solution_data": [
+        [
+            "Carlos",
+            "Paris"
+        ],
+        [
+            "Ana",
+            "Roma"
+        ]
+    ],
+    "schema": [
+        {
+            "table": "pasajeros",
+            "columns": [
+                "id_pasajero (INT)",
+                "nombre (TEXT)"
+            ]
+        },
+        {
+            "table": "vuelos",
+            "columns": [
+                "id_vuelo (INT)",
+                "id_pasajero (INT)",
+                "destino (TEXT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "INNER JOIN",
+            "desc": "La estructura básica es: FROM tabla1 INNER JOIN tabla2 ON tabla1.id = tabla2.id"
+        }
+    ]
+}

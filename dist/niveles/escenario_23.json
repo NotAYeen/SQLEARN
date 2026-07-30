@@ -1,0 +1,41 @@
+{
+    "id_nivel": "escenario_23",
+    "db_name": "suscripciones.db",
+    "dificultad": "Experto",
+    "modalidad": "Terminal",
+    "briefing_mision": "[Suscripciones] Lista 'nombre' del cliente y su 'plan' de suscripción. Usa LEFT JOIN para que los clientes SIN suscripción también aparezcan (su plan se mostrará vacío).",
+    "init_db_sql": "CREATE TABLE cl (id INT, nombre TEXT); CREATE TABLE sub (id_cl INT, plan TEXT); INSERT INTO cl VALUES (1, 'Sam'), (2, 'Tim'); INSERT INTO sub VALUES (1, 'Pro');",
+    "expected_query": "SELECT cl.nombre, sub.plan FROM cl LEFT JOIN sub ON cl.id = sub.id_cl;",
+    "solution_data": [
+        [
+            "Sam",
+            "Pro"
+        ],
+        [
+            "Tim",
+            null
+        ]
+    ],
+    "schema": [
+        {
+            "table": "cl",
+            "columns": [
+                "id (INT)",
+                "nombre (TEXT)"
+            ]
+        },
+        {
+            "table": "sub",
+            "columns": [
+                "id_cl (INT)",
+                "plan (TEXT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "LEFT JOIN",
+            "desc": "Mantiene TODAS las filas de la tabla izquierda, y rellena con NULL donde no hay match a la derecha."
+        }
+    ]
+}
