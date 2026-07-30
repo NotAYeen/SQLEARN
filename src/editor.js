@@ -12,7 +12,7 @@ export class SQLEditor {
         }
 
         const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'monokai';
-        this.editor = CodeMirror.fromTextArea(textArea, {
+        this.editor = window.CodeMirror.fromTextArea(textArea, {
             mode: "text/x-sql",
             lineNumbers: true,
             indentWithTabs: true,

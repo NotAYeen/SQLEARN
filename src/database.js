@@ -9,7 +9,7 @@ export class DatabaseEngine {
         try {
             // Inicializar sql.js importado vía CDN
             // sql.js espera encontrar el archivo .wasm en una URL específica
-            const sqlPromise = initSqlJs({
+            const sqlPromise = window.initSqlJs({
                 locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
             });
             

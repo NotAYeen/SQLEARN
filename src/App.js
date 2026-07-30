@@ -205,6 +205,15 @@ export class App {
         this.renderSchema(level.schema);
         this.renderResources(level.learning_resources);
 
+        const briefing = document.getElementById("mission-briefing");
+        if (briefing) {
+            briefing.innerHTML = `
+                <h2 style="margin-bottom:8px;">Misión ${index + 1}: ${level.db_name || ''}</h2>
+                <p style="font-size:14px; line-height:1.5;">${level.descripcion}</p>
+                <p style="font-size:13px; color:#666; margin-top:8px;"><strong>Objetivo:</strong> ${level.objetivo}</p>
+            `;
+        }
+
         document.getElementById("editor-container").style.display = "none";
         document.getElementById("audit-container").style.display = "none";
         document.getElementById("dnd-container").style.display = "none";
