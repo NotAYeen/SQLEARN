@@ -131,7 +131,7 @@ class App {
 
         // Hint y Solution
         document.getElementById("btn-hint")?.addEventListener("click", () => {
-            alert("Hint: Revisa la sección 'Learning Resources' y la estructura esperada.");
+            this.showModal("Pista (Hint)", "Revisa la sección 'Learning Resources' y la estructura esperada en la tabla inferior.", null, false);
         });
         document.getElementById("btn-solution")?.addEventListener("click", () => {
             const level = this.levels[this.currentLevelIndex];
@@ -139,6 +139,40 @@ class App {
                 window.SqlEditor.setValue(level.expected_query);
             }
         });
+    }
+
+    showModal(title, msg, onConfirm, showCancel = true) {
+        const overlay = document.getElementById("retro-modal-overlay");
+        if (!overlay) return;
+
+        document.getElementById("retro-modal-title").textContent = title;
+        document.getElementById("retro-modal-msg").innerText = msg; // innerText respeta saltos de línea \n
+
+        const btnOk = document.getElementById("retro-modal-ok");
+        const btnCancel = document.getElementById("retro-modal-cancel");
+        const btnX = document.getElementById("retro-modal-x");
+
+        btnCancel.style.display = showCancel ? "flex" : "none";
+
+        // Limpiar eventos previos clonando los botones (truco rápido para evitar fugas de eventos)
+        const newOk = btnOk.cloneNode(true);
+        const newCancel = btnCancel.cloneNode(true);
+        const newX = btnX.cloneNode(true);
+        btnOk.parentNode.replaceChild(newOk, btnOk);
+        btnCancel.parentNode.replaceChild(newCancel, btnCancel);
+        btnX.parentNode.replaceChild(newX, btnX);
+
+        const closeModal = () => overlay.classList.add("hidden");
+
+        newOk.addEventListener("click", () => {
+            closeModal();
+            if (onConfirm) onConfirm();
+        });
+
+        newCancel.addEventListener("click", closeModal);
+        newX.addEventListener("click", closeModal);
+
+        overlay.classList.remove("hidden");
     }
 
     setupResizer() {
@@ -367,10 +401,10 @@ class App {
                     AudioFX.success();
                     span.classList.add("error-found");
                     setTimeout(() => {
-                        if (confirm(`Error encontrado: ${level.explicacion}\n\n¿Avanzar?`)) {
+                        this.showModal("Error Encontrado", `${level.explicacion}\n\n¿Avanzar al siguiente nivel?`, () => {
                             this.loadLevel(this.currentLevelIndex + 1);
-                        }
-                    }, 1000);
+                        });
+                    }, 500);
                 } else {
                     AudioFX.error();
                     span.classList.remove("wrong-click");
@@ -456,9 +490,9 @@ class App {
             AudioFX.success();
             setTimeout(() => {
                 localStorage.removeItem(`sql_sim_code_${this.currentLevelIndex}`);
-                if (confirm("¡Excelente trabajo! ¿Avanzar al siguiente nivel?")) {
+                this.showModal("¡Excelente Trabajo!", "¡Has resuelto el nivel correctamente!\n\n¿Avanzar al siguiente escenario?", () => {
                     this.loadLevel(this.currentLevelIndex + 1);
-                }
+                });
             }, 500);
         } else {
             AudioFX.error();
