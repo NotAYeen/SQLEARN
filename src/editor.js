@@ -26,8 +26,8 @@ export class SQLEditor {
         // Configurar un atajo para ejecutar (Ctrl+Enter) y autocompletar (Ctrl-Space)
         this.editor.setOption("extraKeys", {
             "Ctrl-Enter": () => {
-                if(window.AppController) {
-                    window.AppController.runQuery();
+                if(window.sqlSim) {
+                    window.sqlSim.runQuery();
                 }
             },
             "Ctrl-Space": "autocomplete"

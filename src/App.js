@@ -311,19 +311,25 @@ export class App {
         const sql = this.editor.getValue();
         if (!sql.trim()) return;
 
-        try {
-            const results = this.db.run(sql);
-            if (results && results.length > 0) {
-                this.renderResults(results[0]);
-                this.checkAnswer(results[0].values);
-            } else {
-                this.renderResults({ columns: ["Resultado"], values: [["0 filas devueltas"]] });
-                this.checkAnswer([]);
-            }
-        } catch (e) {
+        const res = this.db.executeQuery(sql);
+
+        if (res.error) {
             AudioFX.error();
-            this.renderResults({ columns: ["Error SQL"], values: [[e.message]] });
+            this.renderResults({ columns: ["Error SQL"], values: [[res.error]] });
+            return;
         }
+
+        if (!res.results) {
+            this.renderResults({ columns: ["Resultado"], values: [["Comando ejecutado con éxito sin filas devueltas"]] });
+            this.checkAnswer([]);
+            return;
+        }
+
+        // Siempre renderizar los resultados primero para que el usuario pueda verlos
+        this.renderResults(res.results);
+
+        // Comprobar si los resultados coinciden con la misión actual
+        this.checkAnswer(res.results.values);
     }
 
     renderResults(res) {
