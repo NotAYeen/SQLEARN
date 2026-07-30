@@ -63,6 +63,7 @@ class App {
         
         try {
             await window.DBEngine.init();
+            this.setupDBSelector();
             this.loadLevel(this.currentLevelIndex);
         } catch (e) {
             console.error("Error crítico: No se pudo inicializar el motor SQL.");
@@ -70,6 +71,25 @@ class App {
 
         this.bindEvents();
         this.setupResizer();
+    }
+
+    setupDBSelector() {
+        const selector = document.getElementById("db-selector");
+        if (!selector) return;
+
+        selector.innerHTML = "";
+        this.levels.forEach((level, index) => {
+            const option = document.createElement("option");
+            option.value = index;
+            // Usamos db_name si existe, o un genérico
+            option.textContent = level.db_name || `Nivel ${index + 1}`;
+            selector.appendChild(option);
+        });
+
+        selector.addEventListener("change", (e) => {
+            const selectedIndex = parseInt(e.target.value);
+            this.loadLevel(selectedIndex);
+        });
     }
 
     bindEvents() {
@@ -172,6 +192,12 @@ class App {
         
         window.DBEngine.loadLevelDB(level.init_db_sql);
         localStorage.setItem('sql_sim_level', index);
+
+        // Sincronizar el selector de DB
+        const selector = document.getElementById("db-selector");
+        if (selector) {
+            selector.value = index;
+        }
 
         this.renderSchema(level);
         this.renderResources(level);
