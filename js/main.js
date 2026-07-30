@@ -71,6 +71,8 @@ class App {
 
         this.bindEvents();
         this.setupResizer();
+        this.renderDocs();
+        this.setupDraggableWindow();
     }
 
     setupDBSelector() {
@@ -228,6 +230,74 @@ class App {
                     window.SqlEditor.editor.refresh();
                 }
             }
+        });
+    }
+
+    renderDocs() {
+        const docsList = document.getElementById("docs-list");
+        if (!docsList || !window.SqlDocs) return;
+
+        docsList.innerHTML = "";
+
+        window.SqlDocs.forEach(category => {
+            // Header de categoría
+            const catHeader = document.createElement("li");
+            catHeader.style.padding = "4px 8px";
+            catHeader.style.fontWeight = "bold";
+            catHeader.style.backgroundColor = "#e0e0e0";
+            catHeader.style.color = "#000";
+            catHeader.style.fontSize = "12px";
+            catHeader.textContent = category.category;
+            docsList.appendChild(catHeader);
+
+            // Elementos
+            category.items.forEach(item => {
+                const li = document.createElement("li");
+                li.className = "schema-column"; // Reutilizamos clase de estilo retro
+                li.innerHTML = `<i class="ph-fill ph-book-open"></i> ${item.name}`;
+                li.addEventListener("click", () => this.showDocWindow(item));
+                docsList.appendChild(li);
+            });
+        });
+
+        document.getElementById("docs-close")?.addEventListener("click", () => {
+            document.getElementById("docs-window").classList.add("hidden");
+        });
+    }
+
+    showDocWindow(item) {
+        const win = document.getElementById("docs-window");
+        document.getElementById("docs-item-name").textContent = item.name;
+        document.getElementById("docs-item-desc").textContent = item.desc;
+        document.getElementById("docs-item-example").textContent = item.example;
+        win.classList.remove("hidden");
+    }
+
+    setupDraggableWindow() {
+        const win = document.getElementById("docs-window");
+        const header = document.getElementById("docs-window-header");
+        if (!win || !header) return;
+
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        header.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            offsetX = e.clientX - win.getBoundingClientRect().left;
+            offsetY = e.clientY - win.getBoundingClientRect().top;
+            document.body.style.userSelect = "none";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+            win.style.left = (e.clientX - offsetX) + "px";
+            win.style.top = (e.clientY - offsetY) + "px";
+            win.style.right = "auto"; // Override CSS right: 50px
+        });
+
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+            document.body.style.userSelect = "";
         });
     }
 
