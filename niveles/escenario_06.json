@@ -1,0 +1,59 @@
+{
+    "id_nivel": "escenario_06",
+    "db_name": "streaming.db",
+    "dificultad": "Avanzado",
+    "modalidad": "Depuración",
+    "briefing_mision": "[Servicio de Streaming] Tenemos un error al buscar el 'Top 3' de usuarios que más minutos han consumido. La consulta une 3 tablas, agrupa por usuario y suma los minutos de las películas, pero hay errores en la sintaxis del ORDER BY y LIMIT. ¡Arréglalo!",
+    "init_db_sql": "\n            CREATE TABLE usuarios (\n                id_usuario INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL\n            );\n            CREATE TABLE catalogo (\n                id_peli INTEGER PRIMARY KEY,\n                titulo TEXT NOT NULL,\n                minutos INTEGER NOT NULL\n            );\n            CREATE TABLE historial_vistas (\n                id_vista INTEGER PRIMARY KEY,\n                id_usuario INTEGER NOT NULL,\n                id_peli INTEGER NOT NULL,\n                FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),\n                FOREIGN KEY (id_peli) REFERENCES catalogo(id_peli)\n            );\n            \n            INSERT INTO usuarios (id_usuario, nombre) VALUES \n            (1, 'Alex'), (2, 'Maria'), (3, 'Juan'), (4, 'Sofia');\n            \n            INSERT INTO catalogo (id_peli, titulo, minutos) VALUES \n            (101, 'Matrix', 136), (102, 'Shrek', 90), (103, 'Inception', 148), (104, 'Avatar', 162);\n            \n            INSERT INTO historial_vistas (id_vista, id_usuario, id_peli) VALUES \n            (1, 1, 101), (2, 1, 102), -- Alex: 226 min\n            (3, 2, 103), (4, 2, 104), (5, 2, 101), -- Maria: 446 min\n            (6, 3, 102), -- Juan: 90 min\n            (7, 4, 104), (8, 4, 103); -- Sofia: 310 min\n        ",
+    "query_defectuoso": "SELECT usuarios.nombre, SUM(catalogo.minutos) FROM usuarios INNER JOIN historial_vistas ON usuarios.id_usuario = historial_vistas.id_usuario INNER JOIN catalogo ON historial_vistas.id_peli = catalogo.id_peli GROUP BY usuarios.nombre ORDER BY SUM(catalogo.minutos) LIMIT 3 DESC;",
+    "expected_query": "SELECT usuarios.nombre, SUM(catalogo.minutos) FROM usuarios INNER JOIN historial_vistas ON usuarios.id_usuario = historial_vistas.id_usuario INNER JOIN catalogo ON historial_vistas.id_peli = catalogo.id_peli GROUP BY usuarios.nombre ORDER BY SUM(catalogo.minutos) DESC LIMIT 3;",
+    "solution_data": [
+        [
+            "Maria",
+            446
+        ],
+        [
+            "Sofia",
+            310
+        ],
+        [
+            "Alex",
+            226
+        ]
+    ],
+    "schema": [
+        {
+            "table": "usuarios",
+            "columns": [
+                "id_usuario (INT)",
+                "nombre (TEXT)"
+            ]
+        },
+        {
+            "table": "catalogo",
+            "columns": [
+                "id_peli (INT)",
+                "titulo (TEXT)",
+                "minutos (INT)"
+            ]
+        },
+        {
+            "table": "historial_vistas",
+            "columns": [
+                "id_vista (INT)",
+                "id_usuario (INT)",
+                "id_peli (INT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "JOIN Múltiple",
+            "desc": "Puedes encadenar varios INNER JOIN para unir 3 o más tablas."
+        },
+        {
+            "title": "ORDER BY & LIMIT",
+            "desc": "El orden de cláusulas siempre es: WHERE, GROUP BY, ORDER BY, LIMIT."
+        }
+    ]
+}

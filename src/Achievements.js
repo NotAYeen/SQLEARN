@@ -1,6 +1,7 @@
+import { Storage } from './storage.js';
 export class AchievementsManager {
     constructor() {
-        this.achievements = JSON.parse(localStorage.getItem('sql_sim_achievements') || '{}');
+        this.achievements = JSON.parse(Storage.getItem() || '{}');
         this.definitions = {
             'first_blood': { title: 'Primera Sangre', desc: '¡Completaste tu primer nivel!' },
             'detective': { title: 'Detective', desc: 'Completaste una auditoría exitosamente.' },
@@ -44,7 +45,7 @@ export class AchievementsManager {
         if (this.achievements[id] || !this.definitions[id]) return; // Already unlocked or doesn't exist
         
         this.achievements[id] = true;
-        localStorage.setItem('sql_sim_achievements', JSON.stringify(this.achievements));
+        Storage.setItem('sql_sim_achievements', JSON.stringify(this.achievements));
         
         this.showToast(this.definitions[id]);
         this.playUnlockSound();

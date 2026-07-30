@@ -1,3 +1,4 @@
+import { Storage } from './storage.js';
 import { SQLEditor } from './editor.js';
 import { DatabaseEngine } from './database.js';
 import { LevelLoader } from './LevelLoader.js';
@@ -16,10 +17,10 @@ export class App {
         this.dndManager = new DndManager(this);
         this.achievements = new AchievementsManager();
         
-        this.currentLevelIndex = parseInt(localStorage.getItem('sql_sim_level')) || 0;
+        this.currentLevelIndex = parseInt(Storage.getItem()) || 0;
         
         // Cargar Tema
-        const savedTheme = localStorage.getItem('sql_sim_theme') || 'dark';
+        const savedTheme = Storage.getItem() || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
     }
 
@@ -28,7 +29,7 @@ export class App {
         this.editor.onChange((code) => {
             AudioFX.init();
             AudioFX.keyPress();
-            localStorage.setItem(`sql_sim_code_${this.currentLevelIndex}`, code);
+            Storage.setItem(`sql_sim_code_${this.currentLevelIndex}`, code);
         });
         
         try {
@@ -74,7 +75,7 @@ export class App {
             const current = html.getAttribute('data-theme');
             const newTheme = current === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('sql_sim_theme', newTheme);
+            Storage.setItem('sql_sim_theme', newTheme);
         });
 
         document.getElementById("menu-view-left")?.addEventListener("click", () => {
@@ -99,8 +100,8 @@ export class App {
                 "Ajustes del Sistema", 
                 "¿Deseas formatear la base de datos local y reiniciar tu progreso al Nivel 1?", 
                 () => {
-                    localStorage.removeItem('sql_sim_level');
-                    localStorage.removeItem('sql_sim_achievements');
+                    Storage.removeItem();
+                    Storage.removeItem();
                     location.reload();
                 }, 
                 true
@@ -194,13 +195,12 @@ export class App {
         if (!level) return;
 
         this.currentLevelIndex = index;
-        localStorage.setItem('sql_sim_level', index);
+        Storage.setItem('sql_sim_level', index);
         
         const selector = document.getElementById("db-selector");
         if (selector) selector.value = index;
 
-        this.db.reset();
-        this.db.run(level.init_db_sql);
+        this.db.loadLevelDB(level.init_db_sql);
 
         this.renderSchema(level.schema);
         this.renderResources(level.learning_resources);
@@ -229,7 +229,7 @@ export class App {
         } else {
             document.getElementById("editor-container").style.display = "block";
             document.getElementById("btn-run").style.display = "inline-flex";
-            const savedCode = localStorage.getItem(`sql_sim_code_${index}`);
+            const savedCode = Storage.getItem();
             if (savedCode) {
                 this.editor.setValue(savedCode);
             } else {
