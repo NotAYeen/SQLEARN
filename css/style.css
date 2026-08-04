@@ -1,0 +1,588 @@
+:root {
+    /* RETRO LIGHT THEME */
+    --bg-desktop: #2b5b5c;
+    --bg-panel: #dfdfd1;
+    --bg-hover: #c9c9b9;
+    --text-primary: #000000;
+    --text-secondary: #555555;
+    
+    --header-bg: linear-gradient(90deg, #0000a0, #1084d0);
+    --header-text: #ffffff;
+    
+    --border-light: #ffffff;
+    --border-shadow: #808080;
+    --border-dark-shadow: #000000;
+
+    --accent-run: #008000;
+    
+    --font-ui: 'Tahoma', 'MS Sans Serif', Arial, sans-serif;
+    --font-mono: 'Courier New', Courier, monospace;
+}
+
+[data-theme="dark"] {
+    /* RETRO DARK THEME */
+    --bg-desktop: #112526;
+    --bg-panel: #2e2e2e;
+    --bg-hover: #404040;
+    --text-primary: #e0e0e0;
+    --text-secondary: #aaaaaa;
+    
+    --header-bg: linear-gradient(90deg, #000050, #004080);
+    --header-text: #ffffff;
+    
+    --border-light: #555555;
+    --border-shadow: #1a1a1a;
+    --border-dark-shadow: #000000;
+
+    --accent-run: #4caf50;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-desktop);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Scrollbars Retro */
+::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+    background-color: var(--bg-panel);
+    border-left: 1px solid var(--border-shadow);
+}
+::-webkit-scrollbar-thumb {
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+}
+::-webkit-scrollbar-button {
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+
+/* APP CONTAINER */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 8px; /* Margin to see desktop background */
+    gap: 8px;
+}
+
+/* TOP NAV */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px;
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    gap: 6px;
+}
+
+/* Retro Buttons */
+.nav-btn {
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    padding: 4px 12px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+    border: none;
+    outline: none;
+}
+
+.nav-btn:active {
+    box-shadow: inset 1px 1px 0px var(--border-dark-shadow), 
+                inset -1px -1px 0px var(--border-light),
+                inset 2px 2px 0px var(--border-shadow);
+    padding: 5px 11px 3px 13px; /* visual shift */
+}
+
+.btn-run {
+    color: var(--accent-run);
+}
+
+/* LAYOUT GRID */
+.app-layout {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    gap: 8px;
+}
+
+.layout-left, .layout-right {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+.layout-mid {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 8px;
+}
+
+/* SIDEBAR SECTIONS (Retro Windows) */
+.sidebar-section {
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+    padding: 2px;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 6px;
+    background: var(--header-bg);
+    color: var(--header-text);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Add faux retro window controls using ::after */
+.section-title::after {
+    content: "✖";
+    display: inline-block;
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    font-size: 10px;
+    padding: 1px 4px;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+    cursor: default;
+}
+
+.section-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-shadow);
+    background-color: var(--bg-panel);
+}
+
+.text-center {
+    text-align: left; /* Windows 95 titles were usually left-aligned */
+}
+
+/* SCHEMA LIST */
+.schema-list {
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    background-color: #ffffff; /* Classic white for lists in retro os */
+    color: #000000;
+    border: 2px solid;
+    border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+    margin: 4px;
+}
+[data-theme="dark"] .schema-list {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+.schema-table-name {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+.schema-table-name:hover {
+    background-color: #000080;
+    color: #ffffff;
+}
+[data-theme="dark"] .schema-table-name:hover {
+    background-color: #004080;
+}
+
+.schema-column {
+    font-size: 12px;
+    padding: 4px 8px 4px 24px;
+    cursor: pointer;
+}
+.schema-column:hover {
+    background-color: #000080;
+    color: #ffffff;
+}
+[data-theme="dark"] .schema-column:hover {
+    background-color: #004080;
+}
+
+/* EDITOR */
+.editor-container {
+    flex: 1 1 auto;
+    min-height: 200px;
+    position: relative;
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+    padding: 4px;
+}
+
+.CodeMirror {
+    height: 100% !important;
+    font-family: var(--font-mono) !important;
+    font-size: 14px;
+    border: 2px solid;
+    border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+}
+
+/* RESIZER */
+.resizer {
+    height: 6px;
+    background-color: var(--bg-panel);
+    cursor: row-resize;
+    position: relative;
+    z-index: 10;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+}
+
+/* RESULTS PANEL */
+.results-panel {
+    height: 250px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+    padding: 4px;
+    overflow: hidden;
+}
+
+.placeholder-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+    text-align: center;
+    background-color: #ffffff;
+    border: 2px solid;
+    border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+}
+[data-theme="dark"] .placeholder-msg { background-color: #1a1a1a; }
+
+.placeholder-msg h2 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+.placeholder-msg p {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.results-content-wrapper {
+    height: 100%;
+    overflow: auto;
+    background-color: #ffffff;
+    border: 2px solid;
+    border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+}
+[data-theme="dark"] .results-content-wrapper { background-color: #1a1a1a; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid var(--border-shadow);
+    padding: 6px;
+    font-size: 13px;
+    text-align: left;
+    color: #000000;
+}
+[data-theme="dark"] th, [data-theme="dark"] td { color: #e0e0e0; }
+
+th {
+    background-color: var(--bg-panel);
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+}
+
+/* RIGHT SIDEBAR ELEMENTS */
+.mission-text {
+    padding: 12px;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    background-color: var(--bg-panel);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow),
+                inset 2px 2px 0px var(--border-light), 
+                inset -2px -2px 0px var(--border-shadow);
+}
+
+.mission-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0; /* padding logic moved */
+}
+.mission-actions .nav-btn {
+    flex: 1;
+    justify-content: center;
+}
+
+.table-info-list {
+    padding: 8px;
+    font-size: 13px;
+    color: var(--text-primary);
+    background-color: #ffffff;
+    border: 2px solid;
+    border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
+    margin: 4px;
+}
+[data-theme="dark"] .table-info-list { background-color: #1a1a1a; color: #e0e0e0; }
+
+.expected-output-wrapper {
+    padding: 4px;
+}
+.expected-table {
+    background-color: #ffffff;
+}
+[data-theme="dark"] .expected-table { background-color: #1a1a1a; }
+
+/* HINTING (AUTOCOMPLETE) CSS OVERRIDES FOR RETRO */
+.CodeMirror-hints {
+    background-color: #ffffff !important;
+    border: 2px solid !important;
+    border-color: var(--border-shadow) var(--border-dark-shadow) var(--border-dark-shadow) var(--border-shadow) !important;
+    font-family: var(--font-ui) !important;
+    font-size: 13px !important;
+    color: #000 !important;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important;
+    padding: 0 !important;
+}
+[data-theme="dark"] .CodeMirror-hints {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+.CodeMirror-hint {
+    padding: 4px 8px !important;
+    border-radius: 0 !important;
+}
+li.CodeMirror-hint-active {
+    background-color: #000080 !important;
+    color: #ffffff !important;
+}
+[data-theme="dark"] li.CodeMirror-hint-active {
+    background-color: #004080 !important;
+}
+
+/* OTHER MODES (Audit, DnD) */
+.audit-container, .dnd-container {
+    padding: 16px;
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+}
+
+.audit-token {
+    cursor: pointer;
+    padding: 2px 4px;
+}
+.audit-token:hover { background-color: var(--bg-hover); }
+.audit-token.error-found { background-color: red; color: #fff; }
+
+.dnd-blocks-source, .dnd-blocks-target {
+    border: 2px inset var(--border-shadow);
+    min-height: 50px;
+    margin-top: 10px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background-color: #ffffff;
+}
+[data-theme="dark"] .dnd-blocks-source, [data-theme="dark"] .dnd-blocks-target { background-color: #1a1a1a; }
+
+.dnd-block {
+    background-color: var(--bg-panel);
+    padding: 6px 12px;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+    cursor: grab;
+    font-size: 13px;
+}
+
+/* CUSTOM RETRO MODAL */
+#retro-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+#retro-modal-overlay.hidden {
+    display: none;
+}
+
+.retro-modal {
+    background-color: var(--bg-panel);
+    border: 2px solid;
+    border-color: var(--border-light) var(--border-dark-shadow) var(--border-dark-shadow) var(--border-light);
+    width: 300px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.retro-modal-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 4px 6px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.retro-modal-close {
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    border: none;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+}
+.retro-modal-close:active {
+    box-shadow: inset 1px 1px 0px var(--border-dark-shadow), 
+                inset -1px -1px 0px var(--border-light);
+}
+
+.retro-modal-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.retro-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+.retro-modal-buttons .nav-btn {
+    min-width: 80px;
+    justify-content: center;
+}
+
+/* ENCYCLOPEDIA FLOATING WINDOW */
+.retro-window {
+    position: fixed;
+    top: 50px;
+    right: 50px;
+    width: 350px;
+    background-color: var(--bg-panel);
+    border: 2px solid;
+    border-color: var(--border-light) var(--border-dark-shadow) var(--border-dark-shadow) var(--border-light);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+}
+.retro-window.hidden {
+    display: none;
+}
+.retro-window-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 4px 6px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    cursor: move; /* Indicates draggability */
+}
+.retro-window-body {
+    padding: 12px;
+    color: var(--text-primary);
+}
+[data-theme="dark"] .retro-window-body code {
+    background-color: #000;
+    color: #00ff00;
+}
+[data-theme="dark"] .retro-window-body div {
+    background-color: #2a2a2a !important;
+    border-color: #555 !important;
+}
+
+@media (max-width: 1000px) {
+    .app-layout {
+        flex-direction: column;
+    }
+    .layout-left, .layout-right {
+        width: 100%;
+    }
+    .layout-mid {
+        min-height: 500px;
+    }
+}
+

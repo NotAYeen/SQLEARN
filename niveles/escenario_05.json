@@ -1,0 +1,64 @@
+{
+    "id_nivel": "escenario_05",
+    "db_name": "ecommerce.db",
+    "dificultad": "Avanzado",
+    "modalidad": "Terminal",
+    "briefing_mision": "[E-Commerce] El equipo de ventas necesita un reporte. Une (JOIN) la tabla 'clientes' con la tabla 'pedidos' para mostrar el 'nombre' del cliente y el 'producto' que compró.",
+    "init_db_sql": "\n            CREATE TABLE clientes (\n                id_cliente INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL,\n                pais TEXT NOT NULL\n            );\n            CREATE TABLE pedidos (\n                id_pedido INTEGER PRIMARY KEY,\n                id_cliente INTEGER NOT NULL,\n                producto TEXT NOT NULL,\n                precio INTEGER NOT NULL,\n                FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)\n            );\n            INSERT INTO clientes (id_cliente, nombre, pais) VALUES \n            (1, 'Andrea Soto', 'México'),\n            (2, 'Carlos Ruiz', 'España'),\n            (3, 'Mariana Gil', 'Colombia'),\n            (4, 'Luis Torres', 'Argentina'),\n            (5, 'Diana Paz', 'Chile');\n            \n            INSERT INTO pedidos (id_pedido, id_cliente, producto, precio) VALUES \n            (101, 2, 'Laptop Pro', 1200),\n            (102, 1, 'Mouse Inalámbrico', 25),\n            (103, 4, 'Monitor 4K', 400),\n            (104, 2, 'Teclado Mecánico', 80),\n            (105, 5, 'Auriculares', 60),\n            (106, 1, 'Webcam', 45);\n        ",
+    "expected_query": "SELECT clientes.nombre, pedidos.producto FROM clientes INNER JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente;",
+    "solution_data": [
+        [
+            "Carlos Ruiz",
+            "Laptop Pro"
+        ],
+        [
+            "Andrea Soto",
+            "Mouse Inalámbrico"
+        ],
+        [
+            "Luis Torres",
+            "Monitor 4K"
+        ],
+        [
+            "Carlos Ruiz",
+            "Teclado Mecánico"
+        ],
+        [
+            "Diana Paz",
+            "Auriculares"
+        ],
+        [
+            "Andrea Soto",
+            "Webcam"
+        ]
+    ],
+    "schema": [
+        {
+            "table": "clientes",
+            "columns": [
+                "id_cliente (INT)",
+                "nombre (TEXT)",
+                "pais (TEXT)"
+            ]
+        },
+        {
+            "table": "pedidos",
+            "columns": [
+                "id_pedido (INT)",
+                "id_cliente (INT)",
+                "producto (TEXT)",
+                "precio (INT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "INNER JOIN",
+            "desc": "Permite combinar filas de dos tablas basándose en una columna relacionada entre ellas."
+        },
+        {
+            "title": "ON",
+            "desc": "Especifica la condición que une las tablas (ej. ON tabla1.id = tabla2.id)."
+        }
+    ]
+}

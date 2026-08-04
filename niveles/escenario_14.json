@@ -1,0 +1,36 @@
+{
+    "id_nivel": "escenario_14",
+    "db_name": "gimnasio.db",
+    "dificultad": "Intermedio",
+    "modalidad": "Terminal",
+    "briefing_mision": "[Gimnasio] Extrae el 'nombre' de los clientes que tengan estado 'Activo' y ordénalos alfabéticamente de forma descendente (Z a A).",
+    "init_db_sql": "\n            CREATE TABLE clientes (id INT, nombre TEXT, estado TEXT);\n            INSERT INTO clientes VALUES (1, 'Zack', 'Activo'), (2, 'Ana', 'Inactivo'), (3, 'Xavier', 'Activo'), (4, 'Beto', 'Activo');\n        ",
+    "expected_query": "SELECT nombre FROM clientes WHERE estado = 'Activo' ORDER BY nombre DESC;",
+    "solution_data": [
+        [
+            "Zack"
+        ],
+        [
+            "Xavier"
+        ],
+        [
+            "Beto"
+        ]
+    ],
+    "schema": [
+        {
+            "table": "clientes",
+            "columns": [
+                "id (INT)",
+                "nombre (TEXT)",
+                "estado (TEXT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "ORDER BY DESC",
+            "desc": "El orden predeterminado es ASC. Usa DESC para invertirlo."
+        }
+    ]
+}

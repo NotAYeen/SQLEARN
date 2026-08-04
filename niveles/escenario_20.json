@@ -1,0 +1,35 @@
+{
+    "id_nivel": "escenario_20",
+    "db_name": "calificaciones.db",
+    "dificultad": "Avanzado",
+    "modalidad": "Depuración",
+    "briefing_mision": "[Calificaciones] Corrige la sintaxis del CASE WHEN. Falta la palabra clave que cierra y finaliza el bloque lógico.",
+    "init_db_sql": "CREATE TABLE notas (alumno TEXT, nota INT); INSERT INTO notas VALUES ('Leo', 90), ('Mia', 50);",
+    "query_defectuoso": "SELECT alumno, CASE WHEN nota >= 60 THEN 'Aprobado' ELSE 'Reprobado' FROM notas;",
+    "expected_query": "SELECT alumno, CASE WHEN nota >= 60 THEN 'Aprobado' ELSE 'Reprobado' END FROM notas;",
+    "solution_data": [
+        [
+            "Leo",
+            "Aprobado"
+        ],
+        [
+            "Mia",
+            "Reprobado"
+        ]
+    ],
+    "schema": [
+        {
+            "table": "notas",
+            "columns": [
+                "alumno (TEXT)",
+                "nota (INT)"
+            ]
+        }
+    ],
+    "learning_resources": [
+        {
+            "title": "CASE WHEN",
+            "desc": "Estructura: CASE WHEN condicion THEN resultado ELSE alternativo END"
+        }
+    ]
+}
