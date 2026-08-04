@@ -1,6 +1,6 @@
 # 🗄️ SQL Practice Simulator
 
-![SQL Simulator Preview](https://via.placeholder.com/1200x600?text=SQL+Simulator+Preview) *(Sustituye esta imagen por una captura de pantalla de tu proyecto)*
+[![Lanzar Simulador](https://img.shields.io/badge/🚀_PROBAR_EN_VIVO-Lanzar_Simulador-success?style=for-the-badge&logo=rocket)](https://notayeen.github.io/SQLEARN/)
 
 Un simulador interactivo y retro para aprender y practicar SQL directamente desde el navegador. Construido como una Single Page Application (SPA), este proyecto te permite sumergirte en 25 niveles y misiones desafiantes, manejando una base de datos SQLite real 100% en el lado del cliente gracias a WebAssembly.
 
@@ -37,7 +37,7 @@ Gracias al empaquetado estático, la forma más fácil de disfrutar el simulador
 ### Opción 1: Ejecución Directa (Recomendada)
 1. Clona o descarga este repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/sqlgithub.git
+   git clone https://github.com/notayeen/SQLEARN.git
    ```
 2. Navega a la carpeta del proyecto.
 3. Haz doble clic en el archivo `index.html` para abrirlo en tu navegador favorito. ¡A jugar!
