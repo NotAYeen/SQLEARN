@@ -140,10 +140,24 @@ body {
     border-radius: 2px;
 }
 
-.nav-left, .nav-right {
+.nav-header-row, .nav-controls-row {
     display: flex;
-    gap: clamp(4px, 0.8vw, 8px);
     align-items: center;
+    gap: 8px;
+}
+.nav-header-row {
+    justify-content: space-between;
+}
+.nav-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.db-select-input {
+    max-width: 240px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 /* Retro Buttons */
@@ -727,14 +741,27 @@ li.CodeMirror-hint-active {
         flex-direction: column;
         align-items: stretch;
         gap: 6px;
+        padding: 6px;
     }
-    .nav-left, .nav-right {
-        justify-content: space-between;
+    .nav-header-row {
         width: 100%;
-        flex-wrap: wrap;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .nav-controls-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .db-select-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: none;
     }
     .main-heading {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     .app-layout {
         flex-direction: column;

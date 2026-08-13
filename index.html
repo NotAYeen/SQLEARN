@@ -60,26 +60,30 @@
     <div class="app-container">
         <!-- TOP NAV -->
         <nav class="top-nav" role="navigation" aria-label="Navegación principal">
-            <div class="nav-left">
-                <!-- Único <h1> por página -->
+            <!-- Fila 1: Título y Acciones de Sistema -->
+            <div class="nav-header-row">
                 <h1 class="main-heading">
                     <span class="brand-tag">SQL</span>
                     <span>Practice Simulator</span>
                 </h1>
+                <div class="nav-actions-group">
+                    <button class="nav-btn" id="btn-theme-toggle" title="Cambiar Tema" aria-label="Cambiar Tema Claro u Oscuro">
+                        <i class="ph ph-sun" aria-hidden="true"></i>
+                    </button>
+                    <button class="nav-btn" id="btn-settings" aria-label="Abrir ajustes del simulador">Ajustes</button>
+                    <button class="nav-btn" id="btn-contact" aria-label="Información de contacto">Contacto</button>
+                </div>
+            </div>
+
+            <!-- Fila 2: Selector de Nivel y Ejecutar -->
+            <div class="nav-controls-row">
+                <select class="nav-btn db-select-input" id="db-selector" aria-label="Seleccionar base de datos o nivel">
+                    <!-- Options populated by main.js -->
+                </select>
                 <button class="nav-btn btn-run" id="btn-run" aria-label="Ejecutar consulta SQL">
                     <span>Ejecutar</span>
                     <i class="ph-fill ph-play" aria-hidden="true"></i>
                 </button>
-                <button class="nav-btn" id="btn-settings" aria-label="Abrir ajustes del simulador">Ajustes</button>
-                <select class="nav-btn" id="db-selector" aria-label="Seleccionar base de datos o nivel">
-                    <!-- Options populated by main.js -->
-                </select>
-            </div>
-            <div class="nav-right">
-                <button class="nav-btn" id="btn-theme-toggle" title="Cambiar Tema" aria-label="Cambiar Tema Claro u Oscuro">
-                    <i class="ph ph-sun" aria-hidden="true"></i>
-                </button>
-                <button class="nav-btn" id="btn-contact" aria-label="Información de contacto">Contacto</button>
             </div>
         </nav>
 
