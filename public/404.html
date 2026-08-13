@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página No Encontrada | SQL Practice Simulator</title>
+    <meta name="description" content="La página que buscas no existe o ha sido movida. Regresa al simulador de consultas SQL.">
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="https://notayeen.github.io/SQLEARN/404.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet"></noscript>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <style>
+        :root {
+            --bg-desktop: #2b5b5c;
+            --bg-panel: #dfdfd1;
+            --text-primary: #000000;
+            --header-bg: linear-gradient(90deg, #0000a0, #1084d0);
+            --header-text: #ffffff;
+            --border-light: #ffffff;
+            --border-shadow: #808080;
+            --border-dark-shadow: #000000;
+            --accent-run: #008000;
+            --font-ui: 'Tahoma', 'MS Sans Serif', Arial, sans-serif;
+            --font-mono: 'Source Code Pro', 'Courier New', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: var(--bg-desktop);
+            font-family: var(--font-ui);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(8px, 2vw, 24px);
+        }
+        .retro-404-window {
+            width: min(90vw, 540px);
+            background-color: var(--bg-panel);
+            box-shadow: inset 1px 1px 0px var(--border-light), 
+                        inset -1px -1px 0px var(--border-dark-shadow),
+                        inset 2px 2px 0px var(--border-light), 
+                        inset -2px -2px 0px var(--border-shadow),
+                        4px 4px 12px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+        .window-header {
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: clamp(4px, 1vw, 8px) clamp(8px, 1.5vw, 12px);
+            font-size: clamp(0.85rem, 1.2vw, 1rem);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .window-body {
+            padding: clamp(16px, 3vw, 32px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: clamp(12px, 2.5vw, 20px);
+        }
+        h1 {
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+        h1 span.code-404 {
+            color: #d32f2f;
+            font-family: var(--font-mono);
+            display: inline-block;
+        }
+        p {
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            color: #333333;
+            line-height: 1.5;
+        }
+        .code-box {
+            background: #ffffff;
+            border: 2px inset var(--border-shadow);
+            padding: clamp(8px, 1.5vw, 12px);
+            font-family: var(--font-mono);
+            font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+            color: #b71c1c;
+            width: 100%;
+            text-align: left;
+        }
+        .nav-btn {
+            background: var(--bg-panel);
+            color: var(--text-primary);
+            border: none;
+            padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
+            font-family: var(--font-ui);
+            font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: inset 1px 1px 0px var(--border-light), 
+                        inset -1px -1px 0px var(--border-dark-shadow),
+                        inset 2px 2px 0px var(--border-light), 
+                        inset -2px -2px 0px var(--border-shadow);
+        }
+        .nav-btn:hover { background-color: #c9c9b9; }
+        .nav-btn:active {
+            box-shadow: inset -1px -1px 0px var(--border-light), 
+                        inset 1px 1px 0px var(--border-dark-shadow);
+        }
+    </style>
+</head>
+<body>
+    <main class="retro-404-window" role="main">
+        <div class="window-header">
+            <i class="ph ph-warning-circle" aria-hidden="true"></i>
+            <span>Error 404 - SQL Practice Simulator</span>
+        </div>
+        <div class="window-body">
+            <h1>
+                <span class="code-404">ERROR 404:</span>
+                <span>Página No Encontrada</span>
+            </h1>
+            <p>La consulta solicitada no devolvió ninguna ruta válida en nuestro servidor.</p>
+            <div class="code-box">
+                <code>SELECT * FROM paginas WHERE url = '404';<br>-- 0 rows returned. Query failed.</code>
+            </div>
+            <a href="https://notayeen.github.io/SQLEARN/" class="nav-btn" aria-label="Volver a la página principal del Simulador SQL">
+                <i class="ph ph-house" aria-hidden="true"></i>
+                <span>Volver al Simulador SQL</span>
+            </a>
+        </div>
+    </main>
+</body>
+</html>

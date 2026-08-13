@@ -1,0 +1,23 @@
+# SQL Practice Simulator (SQLEARN)
+> Un simulador interactivo y retro para aprender y practicar SQL directamente desde el navegador con un motor SQLite en WebAssembly.
+
+## Descripción General
+SQL Practice Simulator es una aplicación web interactiva (SPA) diseñada para enseñar y practicar SQL mediante 25 niveles progresivos. Incorpora un motor SQLite real en WebAssembly (sql.js), un editor de código CodeMirror con autocompletado, modo de ensamblaje por arrastrar y soltar (Drag & Drop con SortableJS), modo de auditoría de código, gamificación con logros y documentación integrada.
+
+## Características Clave
+- **25 Misiones Interactivas:** Ejercicios que abarcan SELECT, WHERE, JOINs, GROUP BY, ORDER BY, subconsultas y manipulación de datos.
+- **Motor SQLite Local (WASM):** Ejecución directa en cliente mediante `sql.js` sin backend ni bases de datos remotas.
+- **Modos de Juego:** Terminal de consultas, ensamblaje por bloques (DND) y auditoría de errores.
+- **Sin Dependencia de Servidor:** Funciona vía servidor web o ejecución directa sobre el protocolo `file://`.
+- **Accesibilidad y SEO:** Cumplimiento de estándares WAI-ARIA, tipografía fluida, meta canónica y optimización LCP/CLS.
+
+## Enlaces Principales
+- Aplicación Web en Vivo: https://notayeen.github.io/SQLEARN/
+- Repositorio del Proyecto: https://github.com/notayeen/SQLEARN
+
+## Stack Tecnológico
+- Frontend Core: HTML5, Vanilla CSS, JavaScript ES6+
+- Bundler: Vite
+- Base de Datos: SQLite / sql.js (WebAssembly)
+- Editor: CodeMirror 5
+- Librerías: SortableJS, Phosphor Icons

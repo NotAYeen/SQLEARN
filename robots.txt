@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://notayeen.github.io/SQLEARN/sitemap.xml

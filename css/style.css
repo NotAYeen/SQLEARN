@@ -19,6 +19,19 @@
     --font-mono: 'Courier New', Courier, monospace;
 }
 
+/* Accessibility Utility Class */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
 [data-theme="dark"] {
     /* RETRO DARK THEME */
     --bg-desktop: #112526;
@@ -48,9 +61,16 @@ body {
     color: var(--text-primary);
     font-family: var(--font-ui);
     height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+/* Accessible Focus States */
+:focus-visible {
+    outline: 2px solid #ffcc00;
+    outline-offset: 1px;
 }
 
 /* Scrollbars Retro */
@@ -82,8 +102,8 @@ body {
     flex-direction: column;
     height: 100%;
     width: 100%;
-    padding: 8px; /* Margin to see desktop background */
-    gap: 8px;
+    padding: clamp(4px, 1vw, 8px);
+    gap: clamp(4px, 1vw, 8px);
 }
 
 /* TOP NAV */
@@ -91,26 +111,48 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px;
+    padding: clamp(4px, 0.8vw, 8px);
     background-color: var(--bg-panel);
     box-shadow: inset 1px 1px 0px var(--border-light), 
                 inset -1px -1px 0px var(--border-dark-shadow),
                 inset 2px 2px 0px var(--border-light), 
                 inset -2px -2px 0px var(--border-shadow);
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.main-heading {
+    font-size: clamp(0.85rem, 1.3vw, 1.15rem);
+    font-weight: bold;
+    margin: 0;
+    padding: 0 4px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.main-heading .brand-tag {
+    color: var(--header-text);
+    background: var(--header-bg);
+    padding: 2px 6px;
+    font-size: clamp(0.75rem, 1vw, 0.9rem);
+    border-radius: 2px;
 }
 
 .nav-left, .nav-right {
     display: flex;
-    gap: 6px;
+    gap: clamp(4px, 0.8vw, 8px);
+    align-items: center;
 }
 
 /* Retro Buttons */
 .nav-btn {
     background-color: var(--bg-panel);
     color: var(--text-primary);
-    padding: 4px 12px;
+    padding: clamp(3px, 0.5vw, 5px) clamp(8px, 1vw, 14px);
     font-family: var(--font-ui);
-    font-size: 13px;
+    font-size: clamp(0.75rem, 0.95vw, 0.85rem);
     font-weight: bold;
     cursor: pointer;
     display: flex;

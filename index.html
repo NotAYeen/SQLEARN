@@ -1,58 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Practice Simulator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <title>SQL Practice Simulator | Aprende y Practica Consultas SQL Interactivas</title>
+    <meta name="description" content="Simulador interactivo retro para aprender y practicar consultas SQL en tiempo real con motor SQLite en WebAssembly (sql.js). Misiones, retos Drag & Drop, auditoría y logros.">
+    <meta name="keywords" content="SQL, SQL simulator, aprender SQL, consultas SQL, SQLite, WebAssembly, práctica SQL interactiva, base de datos">
+    <meta name="author" content="notayeen">
+    <meta name="theme-color" content="#2b5b5c">
+    
+    <!-- Meta Canónica -->
+    <link rel="canonical" href="https://notayeen.github.io/SQLEARN/">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://notayeen.github.io/SQLEARN/">
+    <meta property="og:title" content="SQL Practice Simulator | Aprende y Practica SQL Interactivamente">
+    <meta property="og:description" content="Aprende y practica consultas SQL en tiempo real directamente en tu navegador con SQLite y WebAssembly.">
+    <meta property="og:image" content="https://notayeen.github.io/SQLEARN/css/preview.png">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SQL Practice Simulator">
+    <meta name="twitter:description" content="Aprende y practica consultas SQL en tiempo real directamente en tu navegador.">
+
+    <!-- Carga No Bloqueante de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet"></noscript>
+
+    <!-- CSS Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Datos Estructurados (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalApplication",
+      "name": "SQL Practice Simulator",
+      "operatingSystem": "Any",
+      "applicationCategory": "EducationalApplication",
+      "educationalUse": "SQL Query Practice and Learning",
+      "url": "https://notayeen.github.io/SQLEARN/",
+      "author": {
+        "@type": "Person",
+        "name": "notayeen",
+        "url": "https://github.com/notayeen"
+      },
+      "description": "Simulador interactivo y retro para aprender y practicar SQL directamente desde el navegador con un motor SQLite en WebAssembly."
+    }
+    </script>
 </head>
 <body>
     <div class="app-container">
         <!-- TOP NAV -->
-        <nav class="top-nav">
+        <nav class="top-nav" role="navigation" aria-label="Navegación principal">
             <div class="nav-left">
-                <button class="nav-btn btn-run" id="btn-run">Ejecutar <i class="ph-fill ph-play"></i></button>
-                <button class="nav-btn" id="btn-settings">Ajustes</button>
-                <select class="nav-btn" id="db-selector">
+                <!-- Único <h1> por página -->
+                <h1 class="main-heading">
+                    <span class="brand-tag">SQL</span>
+                    <span>Practice Simulator</span>
+                </h1>
+                <button class="nav-btn btn-run" id="btn-run" aria-label="Ejecutar consulta SQL">
+                    <span>Ejecutar</span>
+                    <i class="ph-fill ph-play" aria-hidden="true"></i>
+                </button>
+                <button class="nav-btn" id="btn-settings" aria-label="Abrir ajustes del simulador">Ajustes</button>
+                <select class="nav-btn" id="db-selector" aria-label="Seleccionar base de datos o nivel">
                     <!-- Options populated by main.js -->
                 </select>
             </div>
             <div class="nav-right">
-                <button class="nav-btn" id="btn-theme-toggle" title="Cambiar Tema"><i class="ph ph-sun"></i></button>
-                <button class="nav-btn" id="btn-contact">Contacto</button>
-                <button class="nav-btn" id="menu-view-left">Menú Izq.</button>
-                <button class="nav-btn" id="menu-view-right">Menú Der.</button>
+                <button class="nav-btn" id="btn-theme-toggle" title="Cambiar Tema" aria-label="Cambiar Tema Claro u Oscuro">
+                    <i class="ph ph-sun" aria-hidden="true"></i>
+                </button>
+                <button class="nav-btn" id="btn-contact" aria-label="Información de contacto">Contacto</button>
+                <button class="nav-btn" id="menu-view-left" aria-label="Alternar visión del panel izquierdo">Menú Izq.</button>
+                <button class="nav-btn" id="menu-view-right" aria-label="Alternar visión del panel derecho">Menú Der.</button>
             </div>
         </nav>
 
         <div class="app-layout">
             <!-- LEFT SIDEBAR -->
-            <aside class="layout-left" id="layout-left">
+            <aside class="layout-left" id="layout-left" role="complementary" aria-label="Panel de esquemas y documentación">
                 <div class="sidebar-section">
-                    <div class="section-title text-center">Base de Datos SQL</div>
+                    <h2 class="section-title text-center">Base de Datos SQL</h2>
                     <div class="section-subtitle text-center">Ver Esquema</div>
                     <ul class="schema-list" id="schema-list"></ul>
                 </div>
                 <div class="sidebar-section">
-                    <div class="section-title text-center" style="margin-top: 10px;">Pistas del Nivel</div>
+                    <h2 class="section-title text-center" style="margin-top: 10px;">Pistas del Nivel</h2>
                     <ul class="schema-list" id="resources-list" style="padding-left:10px;"></ul>
                 </div>
                 <div class="sidebar-section">
-                    <div class="section-title text-center" style="margin-top: 10px;">Enciclopedia SQL</div>
+                    <h2 class="section-title text-center" style="margin-top: 10px;">Enciclopedia SQL</h2>
                     <ul class="schema-list" id="docs-list" style="padding:4px;"></ul>
                 </div>
             </aside>
 
             <!-- MIDDLE COLUMN -->
-            <main class="layout-mid">
+            <main class="layout-mid" role="main" aria-label="Editor de código SQL y resultados">
                 <!-- Editor -->
                 <div class="editor-container" id="editor-container">
-                    <textarea id="sql-editor"></textarea>
+                    <label for="sql-editor" class="visually-hidden">Editor de código SQL</label>
+                    <textarea id="sql-editor" aria-label="Editor de código SQL"></textarea>
                 </div>
                 
                 <!-- Audit & DND Modes (hidden by default) -->
@@ -66,10 +122,10 @@
                     <div class="dnd-blocks-target" id="dnd-blocks-target" title="Suelta los bloques aquí"></div>
                 </div>
 
-                <div class="resizer" id="vertical-resizer"></div>
+                <div class="resizer" id="vertical-resizer" aria-label="Separador de tamaño de paneles"></div>
                 
                 <!-- Results -->
-                <div class="results-panel" id="results-panel">
+                <section class="results-panel" id="results-panel" aria-live="polite" aria-label="Resultados de la consulta SQL">
                     <div class="placeholder-msg" id="results-placeholder">
                         <h2>Práctica SQL</h2>
                         <p>Los resultados de la consulta se muestran aquí.<br>Haz clic en el botón Ejecutar para probar tu código.</p>
@@ -77,27 +133,27 @@
                     <div class="results-content-wrapper" id="results-content" style="display:none;">
                          <table id="results-table"></table>
                     </div>
-                </div>
+                </section>
             </main>
 
             <!-- RIGHT SIDEBAR -->
-            <aside class="layout-right" id="layout-right">
+            <aside class="layout-right" id="layout-right" role="complementary" aria-label="Detalles de la misión e información de tablas">
                 <div class="mission-text" id="mission-briefing">
                     Cargando misión...
                 </div>
                 
                 <div class="mission-actions">
-                    <button class="nav-btn" id="btn-hint">Obtener Pista</button>
-                    <button class="nav-btn" id="btn-solution">Ver Solución</button>
+                    <button class="nav-btn" id="btn-hint" aria-label="Obtener Pista para el nivel actual">Obtener Pista</button>
+                    <button class="nav-btn" id="btn-solution" aria-label="Ver Solución sugerida del nivel">Ver Solución</button>
                 </div>
                 
                 <div class="sidebar-section">
-                    <div class="section-title text-center">Info. de Tabla</div>
+                    <h2 class="section-title text-center">Info. de Tabla</h2>
                     <div class="table-info-list" id="table-info-content"></div>
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="section-title text-center">Pistas</div>
+                    <h2 class="section-title text-center">Pistas</h2>
                     <div class="section-subtitle text-center">Salida Esperada</div>
                     <div class="expected-output-wrapper">
                         <table class="expected-table" id="expected-table"></table>
@@ -108,18 +164,18 @@
     </div>
 
     <!-- Dependencias de JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/sql-hint.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/sql-hint.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js" defer></script>
 
     <!-- CUSTOM MODAL -->
-    <div id="retro-modal-overlay" class="hidden">
+    <div id="retro-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="retro-modal-title">
         <div class="retro-modal">
             <div class="retro-modal-header">
                 <span id="retro-modal-title">Atención</span>
-                <button class="retro-modal-close" id="retro-modal-x"><i class="ph ph-x"></i></button>
+                <button class="retro-modal-close" id="retro-modal-x" aria-label="Cerrar ventana modal"><i class="ph ph-x" aria-hidden="true"></i></button>
             </div>
             <div class="retro-modal-body">
                 <p id="retro-modal-msg"></p>
@@ -132,10 +188,10 @@
     </div>
 
     <!-- ENCYCLOPEDIA FLOATING WINDOW -->
-    <div id="docs-window" class="retro-window hidden">
+    <div id="docs-window" class="retro-window hidden" role="dialog" aria-labelledby="docs-title">
         <div class="retro-window-header" id="docs-window-header">
-            <span id="docs-title"><i class="ph-fill ph-book"></i> Ayuda de SQL</span>
-            <button class="retro-modal-close" id="docs-close"><i class="ph ph-x"></i></button>
+            <span id="docs-title"><i class="ph-fill ph-book" aria-hidden="true"></i> Ayuda de SQL</span>
+            <button class="retro-modal-close" id="docs-close" aria-label="Cerrar ventana de ayuda de SQL"><i class="ph ph-x" aria-hidden="true"></i></button>
         </div>
         <div class="retro-window-body">
             <h3 id="docs-item-name" style="margin-bottom: 8px;"></h3>
@@ -148,6 +204,6 @@
     </div>
 
     <!-- Scripts de la aplicación (Empaquetados) -->
-    <script src="bundle.js"></script>
+    <script src="bundle.js" defer></script>
 </body>
 </html>
