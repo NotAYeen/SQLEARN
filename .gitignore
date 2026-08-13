@@ -1,1 +1,23 @@
-node_modules
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs & cache
+dist/
+build/
+.cache/
+.vite/
+*.log
+
+# Design references, scratch & duplicate assets
+interfaz referencia.jpg
+Plan de Desarrollo - Simulador SQL Interactivo.md
+data/
+js/
+niveles/
+
+# System / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
