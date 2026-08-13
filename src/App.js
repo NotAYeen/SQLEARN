@@ -263,6 +263,14 @@ export class App {
             `;
         }
 
+        const mobileBriefing = document.getElementById("mobile-mission-briefing");
+        if (mobileBriefing) {
+            mobileBriefing.innerHTML = `
+                <div class="mobile-mission-title"><i class="ph-fill ph-target" aria-hidden="true"></i> Misión ${index + 1}: ${level.db_name || ''}</div>
+                <div class="mobile-mission-text">${level.briefing_mision}</div>
+            `;
+        }
+
         document.getElementById("editor-container").style.display = "none";
         document.getElementById("audit-container").style.display = "none";
         document.getElementById("dnd-container").style.display = "none";

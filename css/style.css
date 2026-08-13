@@ -761,13 +761,38 @@ li.CodeMirror-hint-active {
         width: 92vw;
         max-height: 85vh;
     }
-    .retro-modal {
-        width: 92vw;
-        max-width: 360px;
-    }
-    .nav-btn {
-        min-height: 38px;
-        padding: 6px 10px;
+/* MOBILE MISSION BANNER */
+.mobile-mission-banner {
+    display: none;
+    background-color: var(--bg-panel);
+    border: 2px solid;
+    border-color: var(--border-light) var(--border-dark-shadow) var(--border-dark-shadow) var(--border-light);
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+    max-height: 110px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+.mobile-mission-title {
+    font-weight: bold;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.mobile-mission-text {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .mobile-mission-banner {
+        display: block !important;
     }
 }
 
