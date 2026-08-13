@@ -121,15 +121,6 @@ export class App {
             list.style.display = isHidden ? "block" : "none";
             e.target.textContent = isHidden ? "Ocultar" : "Mostrar";
         });
-
-        // Toggle Salida Esperada
-        document.getElementById("toggle-expected-btn")?.addEventListener("click", (e) => {
-            const wrapper = document.getElementById("expected-wrapper");
-            if (!wrapper) return;
-            const isHidden = wrapper.style.display === "none" || !wrapper.style.display;
-            wrapper.style.display = isHidden ? "block" : "none";
-            e.target.textContent = isHidden ? "Ocultar" : "Mostrar";
-        });
     }
 
     setupMobileTabs() {
