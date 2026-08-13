@@ -52,12 +52,35 @@ export class App {
         if (!selector) return;
 
         selector.innerHTML = "";
+
+        const groupBasic = document.createElement("optgroup");
+        groupBasic.label = "🟢 Dificultad: Básica";
+
+        const groupInter = document.createElement("optgroup");
+        groupInter.label = "🟡 Dificultad: Intermedia";
+
+        const groupAdv = document.createElement("optgroup");
+        groupAdv.label = "🔴 Dificultad: Avanzada";
+
         this.loader.levels.forEach((level, index) => {
             const option = document.createElement("option");
             option.value = index;
-            option.textContent = level.db_name || `Nivel ${index + 1}`;
-            selector.appendChild(option);
+            
+            const diff = level.dificultad || "Básico";
+            let tag = "🟢";
+            if (diff.includes("Intermedio") || diff.includes("Medio")) tag = "🟡";
+            else if (diff.includes("Avanzado") || diff.includes("Difícil") || diff.includes("Experto")) tag = "🔴";
+
+            option.textContent = `${tag} Nivel ${index + 1}: ${level.db_name || ''} [${diff}]`;
+            
+            if (tag === "🟢") groupBasic.appendChild(option);
+            else if (tag === "🟡") groupInter.appendChild(option);
+            else groupAdv.appendChild(option);
         });
+
+        if (groupBasic.children.length > 0) selector.appendChild(groupBasic);
+        if (groupInter.children.length > 0) selector.appendChild(groupInter);
+        if (groupAdv.children.length > 0) selector.appendChild(groupAdv);
 
         selector.addEventListener("change", (e) => {
             const selectedIndex = parseInt(e.target.value);
@@ -255,10 +278,25 @@ export class App {
         this.renderResources(level.learning_resources);
         this.renderTableInfo(level.schema);
 
+        const diff = level.dificultad || "Básico";
+        let badgeClass = "badge-easy";
+        let badgeIcon = "🟢";
+        if (diff.includes("Intermedio") || diff.includes("Medio")) {
+            badgeClass = "badge-medium";
+            badgeIcon = "🟡";
+        } else if (diff.includes("Avanzado") || diff.includes("Difícil") || diff.includes("Experto")) {
+            badgeClass = "badge-hard";
+            badgeIcon = "🔴";
+        }
+        const badgeHTML = `<span class="difficulty-badge ${badgeClass}">${badgeIcon} ${diff}</span>`;
+
         const briefing = document.getElementById("mission-briefing");
         if (briefing) {
             briefing.innerHTML = `
-                <h2 style="margin-bottom:8px;">Misión ${index + 1}: ${level.db_name || ''}</h2>
+                <h2 style="margin-bottom:8px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                    <span>Misión ${index + 1}: ${level.db_name || ''}</span>
+                    ${badgeHTML}
+                </h2>
                 <p style="font-size:14px; line-height:1.5;">${level.briefing_mision}</p>
             `;
         }
@@ -266,7 +304,10 @@ export class App {
         const mobileBriefing = document.getElementById("mobile-mission-briefing");
         if (mobileBriefing) {
             mobileBriefing.innerHTML = `
-                <div class="mobile-mission-title"><i class="ph-fill ph-target" aria-hidden="true"></i> Misión ${index + 1}: ${level.db_name || ''}</div>
+                <div class="mobile-mission-title">
+                    <span><i class="ph-fill ph-target" aria-hidden="true"></i> Misión ${index + 1}: ${level.db_name || ''}</span>
+                    ${badgeHTML}
+                </div>
                 <div class="mobile-mission-text">${level.briefing_mision}</div>
             `;
         }
