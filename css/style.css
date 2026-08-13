@@ -433,11 +433,43 @@ th {
 
 .expected-output-wrapper {
     padding: 4px;
+    background-color: var(--bg-panel);
+    overflow-x: auto;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--border-shadow);
 }
 .expected-table {
+    width: 100%;
+    border-collapse: collapse;
     background-color: #ffffff;
+    color: #000000;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    border: 2px solid;
+    border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
 }
-[data-theme="dark"] .expected-table { background-color: #1a1a1a; }
+[data-theme="dark"] .expected-table {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+.expected-table th, .expected-table td {
+    padding: 4px 8px;
+    border: 1px solid var(--border-shadow);
+    text-align: left;
+}
+.expected-table th {
+    background: var(--header-bg);
+    color: var(--header-text);
+    font-weight: bold;
+    font-size: 11px;
+}
+.expected-table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .expected-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.06);
+}
 
 /* HINTING (AUTOCOMPLETE) CSS OVERRIDES FOR RETRO */
 .CodeMirror-hints {

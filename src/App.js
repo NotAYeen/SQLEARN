@@ -79,22 +79,14 @@ export class App {
             Storage.setItem('sql_sim_theme', newTheme);
         });
 
-        document.getElementById("menu-view-left")?.addEventListener("click", () => {
-            document.getElementById("layout-left").classList.toggle("hidden-panel");
-        });
-        document.getElementById("menu-view-right")?.addEventListener("click", () => {
-            document.getElementById("layout-right").classList.toggle("hidden-panel");
-        });
-
         document.getElementById("btn-hint")?.addEventListener("click", () => {
-            // Unhide hints list if hidden
+            // Unhide hints list silently without modal window
             const list = document.getElementById("resources-list");
             const btn = document.getElementById("toggle-hints-btn");
             if (list) {
                 list.style.display = "block";
                 if (btn) btn.textContent = "Ocultar";
             }
-            this.showModal("Pista del Nivel", "Se han desplegado las pistas del nivel en la barra lateral izquierda.", null, false);
         });
 
         document.getElementById("btn-solution")?.addEventListener("click", () => {
@@ -501,6 +493,24 @@ export class App {
             table.innerHTML = "<tbody><tr><td style='padding:6px; font-size:11px; color:var(--text-secondary);'>No requiere salida estructurada.</td></tr></tbody>";
             return;
         }
+
+        const level = this.loader.getLevel(this.currentLevelIndex);
+        let colNames = [];
+        if (level && level.schema && level.schema[0] && level.schema[0].columns) {
+            colNames = level.schema[0].columns.map(c => c.split(' ')[0]);
+        }
+
+        const sampleRow = Array.isArray(expectedData[0]) ? expectedData[0] : [expectedData[0]];
+        const thead = document.createElement("thead");
+        const trHead = document.createElement("tr");
+
+        sampleRow.forEach((_, cIdx) => {
+            const th = document.createElement("th");
+            th.textContent = colNames[cIdx] || `Columna ${cIdx + 1}`;
+            trHead.appendChild(th);
+        });
+        thead.appendChild(trHead);
+        table.appendChild(thead);
 
         const tbody = document.createElement("tbody");
         expectedData.forEach((row) => {
