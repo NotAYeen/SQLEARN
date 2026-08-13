@@ -80,31 +80,47 @@
                     <i class="ph ph-sun" aria-hidden="true"></i>
                 </button>
                 <button class="nav-btn" id="btn-contact" aria-label="Información de contacto">Contacto</button>
-                <button class="nav-btn" id="menu-view-left" aria-label="Alternar visión del panel izquierdo">Menú Izq.</button>
-                <button class="nav-btn" id="menu-view-right" aria-label="Alternar visión del panel derecho">Menú Der.</button>
+                <button class="nav-btn desktop-only-btn" id="menu-view-left" aria-label="Alternar visión del panel izquierdo">Menú Izq.</button>
+                <button class="nav-btn desktop-only-btn" id="menu-view-right" aria-label="Alternar visión del panel derecho">Menú Der.</button>
             </div>
         </nav>
 
+        <!-- MOBILE TAB NAV (Visible en pantallas < 768px) -->
+        <div class="mobile-tab-bar" id="mobile-tab-bar" role="tablist" aria-label="Navegación móvil de paneles">
+            <button class="mobile-tab-btn active" id="tab-btn-editor" role="tab" aria-selected="true" aria-controls="layout-mid">
+                <i class="ph-fill ph-code" aria-hidden="true"></i> Editor
+            </button>
+            <button class="mobile-tab-btn" id="tab-btn-schema" role="tab" aria-selected="false" aria-controls="layout-left">
+                <i class="ph-fill ph-database" aria-hidden="true"></i> Esquema
+            </button>
+            <button class="mobile-tab-btn" id="tab-btn-mission" role="tab" aria-selected="false" aria-controls="layout-right">
+                <i class="ph-fill ph-target" aria-hidden="true"></i> Misión
+            </button>
+        </div>
+
         <div class="app-layout">
             <!-- LEFT SIDEBAR -->
-            <aside class="layout-left" id="layout-left" role="complementary" aria-label="Panel de esquemas y documentación">
+            <aside class="layout-left mobile-hide-panel" id="layout-left" role="complementary" aria-label="Panel de esquemas y documentación">
                 <div class="sidebar-section">
                     <h2 class="section-title text-center">Base de Datos SQL</h2>
                     <div class="section-subtitle text-center">Ver Esquema</div>
                     <ul class="schema-list" id="schema-list"></ul>
                 </div>
                 <div class="sidebar-section">
-                    <h2 class="section-title text-center" style="margin-top: 10px;">Pistas del Nivel</h2>
-                    <ul class="schema-list" id="resources-list" style="padding-left:10px;"></ul>
+                    <div class="section-title text-center section-title-toggle">
+                        <span>Pistas del Nivel</span>
+                        <button class="nav-btn-mini" id="toggle-hints-btn" aria-label="Mostrar u Ocultar Pistas del Nivel">Mostrar</button>
+                    </div>
+                    <ul class="schema-list" id="resources-list" style="padding-left:10px; display:none;"></ul>
                 </div>
                 <div class="sidebar-section">
-                    <h2 class="section-title text-center" style="margin-top: 10px;">Enciclopedia SQL</h2>
+                    <h2 class="section-title text-center">Enciclopedia SQL</h2>
                     <ul class="schema-list" id="docs-list" style="padding:4px;"></ul>
                 </div>
             </aside>
 
             <!-- MIDDLE COLUMN -->
-            <main class="layout-mid" role="main" aria-label="Editor de código SQL y resultados">
+            <main class="layout-mid mobile-show-panel" id="layout-mid" role="main" aria-label="Editor de código SQL y resultados">
                 <!-- Editor -->
                 <div class="editor-container" id="editor-container">
                     <label for="sql-editor" class="visually-hidden">Editor de código SQL</label>
@@ -137,7 +153,7 @@
             </main>
 
             <!-- RIGHT SIDEBAR -->
-            <aside class="layout-right" id="layout-right" role="complementary" aria-label="Detalles de la misión e información de tablas">
+            <aside class="layout-right mobile-hide-panel" id="layout-right" role="complementary" aria-label="Detalles de la misión e información de tablas">
                 <div class="mission-text" id="mission-briefing">
                     Cargando misión...
                 </div>
@@ -153,9 +169,11 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <h2 class="section-title text-center">Pistas</h2>
-                    <div class="section-subtitle text-center">Salida Esperada</div>
-                    <div class="expected-output-wrapper">
+                    <div class="section-title text-center section-title-toggle">
+                        <span>Salida Esperada</span>
+                        <button class="nav-btn-mini" id="toggle-expected-btn" aria-label="Mostrar u Ocultar Salida Esperada">Mostrar</button>
+                    </div>
+                    <div class="expected-output-wrapper" id="expected-wrapper" style="display:none;">
                         <table class="expected-table" id="expected-table"></table>
                     </div>
                 </div>

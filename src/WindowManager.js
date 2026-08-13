@@ -2,10 +2,27 @@ export class WindowManager {
     constructor() {
         this.win = document.getElementById("docs-window");
         this.header = document.getElementById("docs-window-header");
+        this.closeBtn = document.getElementById("docs-close");
         
-        if (this.win && this.header) {
-            this.initDrag();
+        if (this.win) {
+            this.bindCloseEvents();
+            if (this.header) {
+                this.initDrag();
+            }
         }
+    }
+
+    bindCloseEvents() {
+        if (this.closeBtn) {
+            this.closeBtn.addEventListener("click", () => this.hideDoc());
+        }
+
+        // Close when pressing Escape key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !this.win.classList.contains("hidden")) {
+                this.hideDoc();
+            }
+        });
     }
 
     initDrag() {
@@ -13,6 +30,9 @@ export class WindowManager {
         let offsetX, offsetY;
 
         this.header.addEventListener("mousedown", (e) => {
+            // Don't drag if clicking close button
+            if (e.target.closest('#docs-close')) return;
+
             isDragging = true;
             offsetX = e.clientX - this.win.getBoundingClientRect().left;
             offsetY = e.clientY - this.win.getBoundingClientRect().top;

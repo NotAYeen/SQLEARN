@@ -1,4 +1,3 @@
-import { Storage } from './storage.js';
 import { SQLEditor } from './editor.js';
 import { DatabaseEngine } from './database.js';
 import { LevelLoader } from './LevelLoader.js';
@@ -7,6 +6,7 @@ import { DndManager } from './DndManager.js';
 import { AchievementsManager } from './Achievements.js';
 import { SqlDocs } from './docs.js';
 import { AudioFX } from './AudioFX.js';
+import { Storage } from './storage.js';
 
 export class App {
     constructor() {
@@ -17,10 +17,10 @@ export class App {
         this.dndManager = new DndManager(this);
         this.achievements = new AchievementsManager();
         
-        this.currentLevelIndex = parseInt(Storage.getItem()) || 0;
+        this.currentLevelIndex = parseInt(Storage.getItem('sql_sim_level')) || 0;
         
         // Cargar Tema
-        const savedTheme = Storage.getItem() || 'dark';
+        const savedTheme = Storage.getItem('sql_sim_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
     }
 
@@ -44,6 +44,7 @@ export class App {
         this.bindEvents();
         this.setupResizer();
         this.renderDocs();
+        this.setupMobileTabs();
     }
 
     setupDBSelector() {
@@ -86,8 +87,16 @@ export class App {
         });
 
         document.getElementById("btn-hint")?.addEventListener("click", () => {
-            this.showModal("Pista (Hint)", "Revisa la sección 'Learning Resources' y la estructura esperada en la tabla inferior.", null, false);
+            // Unhide hints list if hidden
+            const list = document.getElementById("resources-list");
+            const btn = document.getElementById("toggle-hints-btn");
+            if (list) {
+                list.style.display = "block";
+                if (btn) btn.textContent = "Ocultar";
+            }
+            this.showModal("Pista del Nivel", "Se han desplegado las pistas del nivel en la barra lateral izquierda.", null, false);
         });
+
         document.getElementById("btn-solution")?.addEventListener("click", () => {
             const level = this.loader.getLevel(this.currentLevelIndex);
             if (level && level.expected_query) {
@@ -100,16 +109,64 @@ export class App {
                 "Ajustes del Sistema", 
                 "¿Deseas formatear la base de datos local y reiniciar tu progreso al Nivel 1?", 
                 () => {
-                    Storage.removeItem();
-                    Storage.removeItem();
+                    Storage.removeItem('sql_sim_level');
+                    Storage.removeItem('sql_sim_achievements');
                     location.reload();
                 }, 
                 true
             );
         });
+
         document.getElementById("btn-contact")?.addEventListener("click", () => {
-            this.showModal("Acerca de", "SQL Practice Simulator v2.0\n\nDesarrollado para entrenamiento corporativo y dominio avanzado de bases de datos relacionales.", null, false);
+            this.showModal("Acerca de", "SQL Practice Simulator v2.0\n\nDesarrollado para aprendizaje interactivo y dominio de bases de datos relacionales.", null, false);
         });
+
+        // Toggle Pistas del Nivel
+        document.getElementById("toggle-hints-btn")?.addEventListener("click", (e) => {
+            const list = document.getElementById("resources-list");
+            if (!list) return;
+            const isHidden = list.style.display === "none" || !list.style.display;
+            list.style.display = isHidden ? "block" : "none";
+            e.target.textContent = isHidden ? "Ocultar" : "Mostrar";
+        });
+
+        // Toggle Salida Esperada
+        document.getElementById("toggle-expected-btn")?.addEventListener("click", (e) => {
+            const wrapper = document.getElementById("expected-wrapper");
+            if (!wrapper) return;
+            const isHidden = wrapper.style.display === "none" || !wrapper.style.display;
+            wrapper.style.display = isHidden ? "block" : "none";
+            e.target.textContent = isHidden ? "Ocultar" : "Mostrar";
+        });
+    }
+
+    setupMobileTabs() {
+        const btnEditor = document.getElementById("tab-btn-editor");
+        const btnSchema = document.getElementById("tab-btn-schema");
+        const btnMission = document.getElementById("tab-btn-mission");
+
+        const leftPanel = document.getElementById("layout-left");
+        const midPanel = document.getElementById("layout-mid");
+        const rightPanel = document.getElementById("layout-right");
+
+        if (!btnEditor || !btnSchema || !btnMission) return;
+
+        const switchTab = (activeBtn, showPanel) => {
+            [btnEditor, btnSchema, btnMission].forEach(b => b.classList.remove("active"));
+            activeBtn.classList.add("active");
+
+            [leftPanel, midPanel, rightPanel].forEach(p => {
+                p.classList.remove("mobile-show-panel");
+                p.classList.add("mobile-hide-panel");
+            });
+
+            showPanel.classList.remove("mobile-hide-panel");
+            showPanel.classList.add("mobile-show-panel");
+        };
+
+        btnEditor.addEventListener("click", () => switchTab(btnEditor, midPanel));
+        btnSchema.addEventListener("click", () => switchTab(btnSchema, leftPanel));
+        btnMission.addEventListener("click", () => switchTab(btnMission, rightPanel));
     }
 
     showModal(title, msg, onConfirm, showCancel = true) {
@@ -119,41 +176,50 @@ export class App {
         document.getElementById("retro-modal-title").textContent = title;
         document.getElementById("retro-modal-msg").innerText = msg;
 
-        const btnOk = document.getElementById("btn-modal-ok");
-        const btnCancel = document.getElementById("btn-modal-cancel");
+        const btnOk = document.getElementById("retro-modal-ok");
+        const btnCancel = document.getElementById("retro-modal-cancel");
+        const btnX = document.getElementById("retro-modal-x");
 
-        btnCancel.style.display = showCancel ? "inline-flex" : "none";
+        if (btnCancel) btnCancel.style.display = showCancel ? "inline-flex" : "none";
 
         const cleanup = () => {
             overlay.classList.add("hidden");
-            btnOk.replaceWith(btnOk.cloneNode(true));
-            btnCancel.replaceWith(btnCancel.cloneNode(true));
         };
 
-        btnOk.onclick = () => {
+        if (btnOk) btnOk.onclick = () => {
             if (onConfirm) onConfirm();
             cleanup();
         };
-        btnCancel.onclick = () => cleanup();
+        if (btnCancel) btnCancel.onclick = () => cleanup();
+        if (btnX) btnX.onclick = () => cleanup();
+
+        // Close on Escape key
+        const escHandler = (e) => {
+            if (e.key === "Escape") {
+                cleanup();
+                document.removeEventListener("keydown", escHandler);
+            }
+        };
+        document.addEventListener("keydown", escHandler);
 
         overlay.classList.remove("hidden");
     }
 
     setupResizer() {
-        const resizer = document.getElementById('resizer');
+        const resizer = document.getElementById('vertical-resizer');
         const leftPanel = document.getElementById('editor-container');
         let isResizing = false;
 
-        resizer?.addEventListener('mousedown', (e) => {
+        resizer?.addEventListener('mousedown', () => {
             isResizing = true;
             document.body.style.cursor = 'ew-resize';
         });
 
         document.addEventListener('mousemove', (e) => {
-            if (!isResizing) return;
+            if (!isResizing || !leftPanel || !leftPanel.parentElement) return;
             const containerOffset = leftPanel.parentElement.getBoundingClientRect().left;
             const newWidth = e.clientX - containerOffset;
-            if (newWidth > 200 && newWidth < window.innerWidth - 300) {
+            if (newWidth > 150 && newWidth < window.innerWidth - 300) {
                 leftPanel.style.flex = `0 0 ${newWidth}px`;
             }
         });
@@ -169,24 +235,24 @@ export class App {
         if (!docsList) return;
 
         docsList.innerHTML = "";
-
-        SqlDocs.forEach(category => {
-            const catHeader = document.createElement("li");
-            catHeader.style.padding = "4px 8px";
-            catHeader.style.fontWeight = "bold";
-            catHeader.style.backgroundColor = "#e0e0e0";
-            catHeader.style.color = "#000";
-            catHeader.style.fontSize = "12px";
-            catHeader.textContent = category.category;
-            docsList.appendChild(catHeader);
-
-            category.items.forEach(item => {
-                const li = document.createElement("li");
-                li.className = "schema-column";
-                li.innerHTML = `<i class="ph-fill ph-book-open"></i> ${item.name}`;
-                li.addEventListener("click", () => this.winManager.showDoc(item));
-                docsList.appendChild(li);
+        SqlDocs.forEach(cat => {
+            const catLi = document.createElement("li");
+            catLi.innerHTML = `<div class="schema-table-name" style="color:var(--text-primary);"><i class="ph-fill ph-folder"></i> ${cat.category}</div>`;
+            
+            const itemList = document.createElement("ul");
+            itemList.className = "schema-list";
+            itemList.style.border = "none";
+            
+            cat.items.forEach(item => {
+                const itemLi = document.createElement("li");
+                itemLi.className = "schema-column";
+                itemLi.innerHTML = `<i class="ph-fill ph-code"></i> ${item.name}`;
+                itemLi.onclick = () => this.winManager.showDoc(item);
+                itemList.appendChild(itemLi);
             });
+
+            catLi.appendChild(itemList);
+            docsList.appendChild(catLi);
         });
     }
 
@@ -204,6 +270,7 @@ export class App {
 
         this.renderSchema(level.schema);
         this.renderResources(level.learning_resources);
+        this.renderTableInfo(level.schema);
 
         const briefing = document.getElementById("mission-briefing");
         if (briefing) {
@@ -228,7 +295,7 @@ export class App {
         } else {
             document.getElementById("editor-container").style.display = "block";
             document.getElementById("btn-run").style.display = "inline-flex";
-            const savedCode = Storage.getItem();
+            const savedCode = Storage.getItem(`sql_sim_code_${index}`);
             if (savedCode) {
                 this.editor.setValue(savedCode);
             } else {
@@ -243,7 +310,9 @@ export class App {
 
     renderSchema(schema) {
         const list = document.getElementById("schema-list");
+        if (!list) return;
         list.innerHTML = "";
+        if (!schema) return;
         schema.forEach(tbl => {
             const li = document.createElement("li");
             li.innerHTML = `<div class="schema-table-name"><i class="ph-fill ph-table"></i> ${tbl.table}</div>`;
@@ -264,18 +333,76 @@ export class App {
         });
     }
 
+    renderTableInfo(schema) {
+        const container = document.getElementById("table-info-content");
+        if (!container) return;
+        container.innerHTML = "";
+
+        if (!schema || schema.length === 0) {
+            container.innerHTML = "<div style='padding:6px 8px; font-size:11px; color:var(--text-secondary);'>Sin tablas asignadas.</div>";
+            return;
+        }
+
+        schema.forEach(tbl => {
+            const card = document.createElement("div");
+            card.style.padding = "6px 8px";
+            card.style.borderBottom = "1px solid var(--border-shadow)";
+            card.style.fontSize = "12px";
+
+            const tableName = document.createElement("div");
+            tableName.style.fontWeight = "bold";
+            tableName.style.color = "var(--text-primary)";
+            tableName.style.marginBottom = "3px";
+            tableName.innerHTML = `<i class="ph-fill ph-table"></i> Tabla: <span style="color:#0000a0;">${tbl.table}</span>`;
+
+            const colCount = document.createElement("div");
+            colCount.style.fontSize = "11px";
+            colCount.style.color = "var(--text-secondary)";
+            colCount.textContent = `Total Columnas: ${tbl.columns ? tbl.columns.length : 0}`;
+
+            const colBadgeWrapper = document.createElement("div");
+            colBadgeWrapper.style.marginTop = "4px";
+            colBadgeWrapper.style.display = "flex";
+            colBadgeWrapper.style.flexWrap = "wrap";
+            colBadgeWrapper.style.gap = "4px";
+
+            if (tbl.columns) {
+                tbl.columns.forEach(col => {
+                    const badge = document.createElement("span");
+                    badge.style.background = "var(--bg-hover)";
+                    badge.style.border = "1px solid var(--border-shadow)";
+                    badge.style.padding = "1px 4px";
+                    badge.style.fontSize = "10px";
+                    badge.style.fontFamily = "var(--font-mono)";
+                    badge.style.color = "var(--text-primary)";
+                    badge.textContent = col;
+                    colBadgeWrapper.appendChild(badge);
+                });
+            }
+
+            card.appendChild(tableName);
+            card.appendChild(colCount);
+            card.appendChild(colBadgeWrapper);
+            container.appendChild(card);
+        });
+    }
+
     renderResources(resources) {
         const list = document.getElementById("resources-list");
+        if (!list) return;
         list.innerHTML = "";
-        if (!resources) return;
+        if (!resources || resources.length === 0) {
+            list.innerHTML = "<li style='padding:6px; font-size:11px; color:var(--text-secondary);'>Sin pistas requeridas para este nivel.</li>";
+            return;
+        }
         resources.forEach(res => {
             const li = document.createElement("li");
             li.className = "schema-column";
             li.style.flexDirection = "column";
             li.style.alignItems = "flex-start";
             li.innerHTML = `
-                <div style="font-weight:bold; margin-bottom:4px;"><i class="ph-fill ph-lightbulb"></i> ${res.title}</div>
-                <div style="font-size: 11px; line-height: 1.3;">${res.desc}</div>
+                <div style="font-weight:bold; margin-bottom:4px; color:var(--text-primary);"><i class="ph-fill ph-lightbulb"></i> ${res.title}</div>
+                <div style="font-size: 11px; line-height: 1.3; color:var(--text-secondary);">${res.desc}</div>
             `;
             list.appendChild(li);
         });
@@ -283,6 +410,7 @@ export class App {
 
     setupAuditMode(level) {
         const area = document.getElementById("audit-code-area");
+        if (!area) return;
         area.innerHTML = "";
         level.audit_tokens.forEach((token, idx) => {
             const span = document.createElement("span");
@@ -332,10 +460,13 @@ export class App {
     }
 
     renderResults(res) {
-        document.getElementById("results-placeholder").style.display = "none";
-        document.getElementById("results-content").style.display = "block";
+        const placeholder = document.getElementById("results-placeholder");
+        const contentWrapper = document.getElementById("results-content");
+        if (placeholder) placeholder.style.display = "none";
+        if (contentWrapper) contentWrapper.style.display = "block";
 
         const table = document.getElementById("results-table");
+        if (!table) return;
         table.innerHTML = "";
 
         const thead = document.createElement("thead");
@@ -366,21 +497,37 @@ export class App {
         if (!table) return;
         table.innerHTML = "";
 
+        if (!expectedData || expectedData.length === 0) {
+            table.innerHTML = "<tbody><tr><td style='padding:6px; font-size:11px; color:var(--text-secondary);'>No requiere salida estructurada.</td></tr></tbody>";
+            return;
+        }
+
         const tbody = document.createElement("tbody");
-        expectedData.forEach(row => {
+        expectedData.forEach((row) => {
             const tr = document.createElement("tr");
-            row.forEach(val => {
+            if (Array.isArray(row)) {
+                row.forEach(val => {
+                    const td = document.createElement("td");
+                    td.textContent = val !== null ? val : 'NULL';
+                    tr.appendChild(td);
+                });
+            } else {
                 const td = document.createElement("td");
-                td.textContent = val !== null ? val : 'NULL';
+                td.textContent = row;
                 tr.appendChild(td);
-            });
+            }
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
     }
 
     clearResults() {
-        document.getElementById("results-table").innerHTML = "";
+        const placeholder = document.getElementById("results-placeholder");
+        const contentWrapper = document.getElementById("results-content");
+        if (placeholder) placeholder.style.display = "block";
+        if (contentWrapper) contentWrapper.style.display = "none";
+        const table = document.getElementById("results-table");
+        if (table) table.innerHTML = "";
     }
 
     checkAnswer(actualData) {
