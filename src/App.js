@@ -336,7 +336,7 @@ export class App {
             tableName.style.fontWeight = "bold";
             tableName.style.color = "var(--text-primary)";
             tableName.style.marginBottom = "3px";
-            tableName.innerHTML = `<i class="ph-fill ph-table"></i> Tabla: <span style="color:#0000a0;">${tbl.table}</span>`;
+            tableName.innerHTML = `<i class="ph-fill ph-table"></i> Tabla: <span style="color:var(--text-primary); font-weight:bold;">${tbl.table}</span>`;
 
             const colCount = document.createElement("div");
             colCount.style.fontSize = "11px";
