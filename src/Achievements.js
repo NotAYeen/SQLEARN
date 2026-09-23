@@ -1,7 +1,7 @@
 import { Storage } from './storage.js';
 export class AchievementsManager {
     constructor() {
-        this.achievements = JSON.parse(Storage.getItem() || '{}');
+        this.achievements = JSON.parse(Storage.getItem('sql_sim_achievements', '{}') || '{}');
         this.definitions = {
             'first_blood': { title: 'Primera Sangre', desc: '¡Completaste tu primer nivel!' },
             'detective': { title: 'Detective', desc: 'Completaste una auditoría exitosamente.' },
@@ -17,6 +17,9 @@ export class AchievementsManager {
         if (!container) {
             container = document.createElement('div');
             container.id = 'toast-container';
+            container.setAttribute('role', 'status');
+            container.setAttribute('aria-live', 'polite');
+            container.setAttribute('aria-atomic', 'true');
             Object.assign(container.style, {
                 position: 'fixed',
                 bottom: '20px',

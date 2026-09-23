@@ -23,6 +23,12 @@ export class SQLEditor {
             theme: theme 
         });
 
+        // Make the editor accessible: CodeMirror 5 replaces the textarea
+        const wrapper = this.editor.getWrapperElement();
+        wrapper.setAttribute('role', 'application');
+        wrapper.setAttribute('aria-label', 'Editor de código SQL');
+        wrapper.setAttribute('aria-multiline', 'true');
+
         // Configurar un atajo para ejecutar (Ctrl+Enter) y autocompletar (Ctrl-Space)
         this.editor.setOption("extraKeys", {
             "Ctrl-Enter": () => {
@@ -32,6 +38,8 @@ export class SQLEditor {
             },
             "Ctrl-Space": "autocomplete"
         });
+
+        this.updateHints([]);
 
         // Disparar autocompletado al escribir
         this.editor.on("inputRead", (cm, change) => {
@@ -52,6 +60,26 @@ export class SQLEditor {
 
     onChange(callback) {
         this.onChangeCallback = callback;
+    }
+
+    updateHints(schema) {
+        if (!this.editor) return;
+        const tables = {};
+        (schema || []).forEach(tbl => {
+            const cols = {};
+            (tbl.columns || []).forEach(c => {
+                const colName = String(c).split(' ')[0];
+                cols[colName] = null;
+            });
+            tables[tbl.table] = cols;
+        });
+        this.editor.setOption("hintOptions", { tables });
+    }
+
+    applyTheme() {
+        if (!this.editor) return;
+        const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'monokai';
+        this.editor.setOption("theme", theme);
     }
 
     getValue() {

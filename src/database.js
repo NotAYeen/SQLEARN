@@ -10,7 +10,7 @@ export class DatabaseEngine {
             // Inicializar sql.js importado vía CDN
             // sql.js espera encontrar el archivo .wasm en una URL específica
             const sqlPromise = window.initSqlJs({
-                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                locateFile: file => `https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/${file}`
             });
             
             this.SQL = await sqlPromise;
@@ -48,13 +48,20 @@ export class DatabaseEngine {
             // db.exec devuelve un array de resultados para cada statement ejecutado
             // Ej: [{columns:['a','b'], values:[[1,2],[3,4]]}]
             const res = this.db.exec(query);
-            
+
             if (res.length === 0) {
                 // Sentencia válida pero no retorna data (ej. UPDATE, INSERT)
                 return { success: true, results: null };
             }
-            
-            return { success: true, results: res[0] };
+
+            // En consultas con varias sentencias (ej. nivel DND con INSERT + SELECT),
+            // nos quedamos con el último result set que tenga columnas reales.
+            const withData = res.filter(r => r && r.columns && r.columns.length > 0);
+            if (withData.length === 0) {
+                return { success: true, results: null };
+            }
+
+            return { success: true, results: withData[withData.length - 1] };
         } catch (err) {
             return { error: err.message };
         }
