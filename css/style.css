@@ -75,25 +75,31 @@ body {
 
 /* Scrollbars Retro */
 ::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     background-color: var(--bg-panel);
     border-left: 1px solid var(--border-shadow);
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--bg-panel);
+    background-color: #bdbdad;
     box-shadow: inset 1px 1px 0px var(--border-light), 
                 inset -1px -1px 0px var(--border-dark-shadow),
                 inset 2px 2px 0px var(--border-light), 
                 inset -2px -2px 0px var(--border-shadow);
 }
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: #4a4a4a;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a5a595;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background-color: #5a5a5a;
+}
 ::-webkit-scrollbar-button {
-    background-color: var(--bg-panel);
-    box-shadow: inset 1px 1px 0px var(--border-light), 
-                inset -1px -1px 0px var(--border-dark-shadow);
-    display: block;
-    height: 16px;
-    width: 16px;
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 /* APP CONTAINER */
@@ -177,7 +183,16 @@ body {
                 inset 2px 2px 0px var(--border-light), 
                 inset -2px -2px 0px var(--border-shadow);
     border: none;
-    outline: none;
+}
+
+.nav-btn:hover { background-color: var(--bg-hover); }
+
+.nav-btn:focus-visible,
+.nav-btn-mini:focus-visible,
+.mobile-tab-btn:focus-visible,
+.retro-modal-close:focus-visible {
+    outline: 2px solid #ffcc00;
+    outline-offset: 2px;
 }
 
 .nav-btn:active {
@@ -239,18 +254,7 @@ body {
     align-items: center;
 }
 
-/* Add faux retro window controls using ::after */
-.section-title::after {
-    content: "✖";
-    display: inline-block;
-    background-color: var(--bg-panel);
-    color: var(--text-primary);
-    font-size: 10px;
-    padding: 1px 4px;
-    box-shadow: inset 1px 1px 0px var(--border-light), 
-                inset -1px -1px 0px var(--border-dark-shadow);
-    cursor: default;
-}
+/* Remove faux "close" buttons: they were decorative but misleading */
 
 .section-subtitle {
     font-size: 12px;
@@ -470,7 +474,7 @@ th {
     background: var(--header-bg);
     color: var(--header-text);
     font-weight: bold;
-    font-size: 11px;
+    font-size: 12px;
 }
 .expected-table tr:nth-child(even) {
     background-color: rgba(0, 0, 0, 0.04);
@@ -505,18 +509,82 @@ li.CodeMirror-hint-active {
 
 /* OTHER MODES (Audit, DnD) */
 .audit-container, .dnd-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
     padding: 16px;
     background-color: var(--bg-panel);
     color: var(--text-primary);
     font-family: var(--font-mono);
 }
 
+.audit-instruction, .dnd-instruction {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: bold;
+    padding: 8px 10px;
+    background: var(--header-bg);
+    color: var(--header-text);
+    border: 1px solid var(--border-shadow);
+}
+
+.audit-code {
+    border: 2px inset var(--border-shadow);
+    background-color: #ffffff;
+    color: #111111;
+    padding: 14px 16px;
+    font-size: 15px;
+    line-height: 2;
+    letter-spacing: 0.3px;
+    overflow-x: auto;
+    box-shadow: 1px 1px 0 var(--border-light);
+}
+[data-theme="dark"] .audit-code {
+    background-color: #111111;
+    color: #eeeeee;
+    border-color: #333333;
+}
+
 .audit-token {
+    display: inline-block;
+    white-space: nowrap;
     cursor: pointer;
-    padding: 2px 4px;
+    padding: 3px 6px;
+    margin: 2px 0;
+    border: 2px solid transparent;
+    border-radius: 2px;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 .audit-token:hover { background-color: var(--bg-hover); }
-.audit-token.error-found { background-color: red; color: #fff; }
+.audit-token:focus-visible {
+    outline: 2px solid #ffcc00;
+    outline-offset: 1px;
+}
+.audit-token.error-found {
+    background-color: #c62828;
+    color: #ffffff;
+    border-color: #ffd54f;
+    text-decoration: underline wavy #ffd54f;
+    text-underline-offset: 3px;
+    font-weight: bold;
+}
+.audit-token.locked { pointer-events: none; opacity: 0.85; }
+.audit-token-wrong {
+    background-color: #7a5a00;
+    color: #ffffff;
+    text-decoration: line-through;
+    animation: shake-token 0.35s ease-in-out 2;
+}
+@keyframes shake-token {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+#expected-panel .expected-table {
+    margin-bottom: 4px;
+}
 
 .dnd-blocks-source, .dnd-blocks-target {
     border: 2px inset var(--border-shadow);
@@ -530,13 +598,72 @@ li.CodeMirror-hint-active {
 }
 [data-theme="dark"] .dnd-blocks-source, [data-theme="dark"] .dnd-blocks-target { background-color: #1a1a1a; }
 
-.dnd-block {
+.dnd-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+.dnd-pane {
+    flex: 1 1 240px;
+    min-width: 0;
+    border: 2px dashed var(--border-shadow);
+    padding: 10px;
+}
+.dnd-pane.dnd-pane-target {
+    border: 2px solid var(--border-dark-shadow);
+    background: var(--bg-panel);
+}
+
+.dnd-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     background-color: var(--bg-panel);
-    padding: 6px 12px;
+    padding: 4px 6px 4px 12px;
     box-shadow: inset 1px 1px 0px var(--border-light), 
                 inset -1px -1px 0px var(--border-dark-shadow);
-    cursor: grab;
+}
+
+.dnd-block {
+    flex: 1;
+    font-family: var(--font-mono);
     font-size: 13px;
+    cursor: grab;
+    user-select: none;
+}
+
+.dnd-btn {
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    border: 1px solid var(--border-shadow);
+    box-shadow: inset 1px 1px 0px var(--border-light), 
+                inset -1px -1px 0px var(--border-dark-shadow);
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.dnd-btn:focus-visible { outline: 2px solid #ffcc00; outline-offset: 1px; }
+.dnd-btn:active {
+    box-shadow: inset -1px -1px 0px var(--border-light), 
+                inset 1px 1px 0px var(--border-dark-shadow);
+}
+.dnd-btn-add { color: #1b5e20; }
+.dnd-btn-remove { color: #b71c1c; }
+[data-theme="dark"] .dnd-btn-add { color: #4caf50; }
+[data-theme="dark"] .dnd-btn-remove { color: #ef5350; }
+.dnd-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.truncation-note td {
+    padding: 8px;
+    font-style: italic;
+    text-align: center;
+    color: var(--text-secondary);
+    background-color: var(--bg-hover);
 }
 
 /* CUSTOM RETRO MODAL */
@@ -656,7 +783,7 @@ li.CodeMirror-hint-active {
 }
 .docs-example-box strong {
     color: #4caf50;
-    font-size: 11px;
+    font-size: 12px;
 }
 #docs-item-example {
     font-family: var(--font-mono);
@@ -678,9 +805,9 @@ li.CodeMirror-hint-active {
 .nav-btn-mini {
     background-color: var(--bg-panel);
     color: var(--text-primary);
-    padding: 1px 6px;
+    padding: 2px 8px;
     font-family: var(--font-ui);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
     border: 1px solid var(--border-shadow);
@@ -786,8 +913,22 @@ li.CodeMirror-hint-active {
         right: auto !important;
         transform: translate(-50%, -50%);
         width: 92vw;
+    }
     .mobile-mission-banner {
         display: block !important;
+    }
+    #vertical-resizer {
+        display: none !important;
+    }
+    .dnd-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .dnd-pane {
+        flex: 1 1 auto;
+    }
+    .btn-reset-db .reset-label {
+        display: none;
     }
 }
 
@@ -807,7 +948,7 @@ li.CodeMirror-hint-active {
 }
 .mobile-mission-title {
     font-weight: bold;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-primary);
     margin-bottom: 3px;
     display: flex;
@@ -817,7 +958,7 @@ li.CodeMirror-hint-active {
     gap: 6px;
 }
 .mobile-mission-text {
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--text-secondary);
 }
@@ -839,7 +980,7 @@ option {
     align-items: center;
     gap: 4px;
     padding: 2px 6px;
-    font-size: 10px;
+    font-size: 12px;
     font-family: var(--font-mono);
     font-weight: bold;
     border-radius: 2px;
@@ -851,7 +992,7 @@ option {
     color: #ffffff !important;
 }
 .badge-medium {
-    background-color: #e65100;
+    background-color: #bf360c;
     color: #ffffff !important;
 }
 .badge-hard {

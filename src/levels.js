@@ -52,7 +52,7 @@ export const LEVELS = [
     "db_name": "metro.db",
     "dificultad": "Intermedio",
     "modalidad": "Depuración",
-    "briefing_mision": "[Transporte Público] El panel de horarios del metro está fallando. Se supone que debe mostrar las estaciones de la línea 'Roja' que tienen una incidencia ('incidencia' = 1). Arregla el código defectuoso.",
+    "briefing_mision": "[Transporte Público] El panel de horarios del metro está fallando. Se supone que debe mostrar las estaciones de la línea 'Roja' que tienen una incidencia ('incidencia' = 1). Corrige la consulta para que muestre solo esas estaciones.",
     "init_db_sql": "\n            CREATE TABLE estaciones (\n                id INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL,\n                linea TEXT NOT NULL,\n                incidencia INTEGER NOT NULL\n            );\n            INSERT INTO estaciones (id, nombre, linea, incidencia) VALUES \n            (101, 'Central', 'Roja', 1),\n            (102, 'Norte', 'Azul', 0),\n            (103, 'Plaza Mayor', 'Roja', 0),\n            (104, 'Sur', 'Verde', 1),\n            (105, 'Universidad', 'Roja', 1);\n        ",
     "query_defectuoso": "SELECT nombre FROM estaciones WHERE linea = 'Roja' OR incidencia = 1;",
     "expected_query": "SELECT nombre FROM estaciones WHERE linea = 'Roja' AND incidencia = 1;",
@@ -132,7 +132,7 @@ export const LEVELS = [
     "db_name": "hospital.db",
     "dificultad": "Intermedio",
     "modalidad": "Ensamblaje",
-    "briefing_mision": "[Hospital] El médico de guardia necesita ver rápidamente los pacientes asignados a 'Cardiología'. Ensambla los bloques arrastrándolos para formar la consulta correcta.",
+    "briefing_mision": "[Hospital] El médico de guardia necesita ver rápidamente el 'nombre' y la 'habitacion' de los pacientes asignados a 'Cardiología'. Ensambla los bloques arrastrándolos para formar la consulta correcta.",
     "init_db_sql": "\n            CREATE TABLE pacientes (\n                id INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL,\n                area TEXT NOT NULL,\n                habitacion INTEGER NOT NULL\n            );\n            INSERT INTO pacientes (id, nombre, area, habitacion) VALUES \n            (1, 'Manuel Ortiz', 'Cardiología', 101),\n            (2, 'Lucia Perez', 'Neurología', 202),\n            (3, 'Andrés Silva', 'Cardiología', 105);\n        ",
     "dnd_blocks": [
       "WHERE area = 'Cardiología'",
@@ -242,7 +242,7 @@ export const LEVELS = [
     "db_name": "streaming.db",
     "dificultad": "Avanzado",
     "modalidad": "Depuración",
-    "briefing_mision": "[Servicio de Streaming] Tenemos un error al buscar el 'Top 3' de usuarios que más minutos han consumido. La consulta une 3 tablas, agrupa por usuario y suma los minutos de las películas, pero hay errores en la sintaxis del ORDER BY y LIMIT. ¡Arréglalo!",
+    "briefing_mision": "[Servicio de Streaming] Tenemos un error al buscar el 'Top 3' de usuarios que más minutos han consumido. La consulta une 3 tablas, agrupa por usuario y suma los minutos de las películas, pero el orden de cláusulas está mal: el DESC debe ir justo antes de LIMIT para obtener el Top 3 de mayor a menor consumo. Corrige la consulta.",
     "init_db_sql": "\n            CREATE TABLE usuarios (\n                id_usuario INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL\n            );\n            CREATE TABLE catalogo (\n                id_peli INTEGER PRIMARY KEY,\n                titulo TEXT NOT NULL,\n                minutos INTEGER NOT NULL\n            );\n            CREATE TABLE historial_vistas (\n                id_vista INTEGER PRIMARY KEY,\n                id_usuario INTEGER NOT NULL,\n                id_peli INTEGER NOT NULL,\n                FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),\n                FOREIGN KEY (id_peli) REFERENCES catalogo(id_peli)\n            );\n            \n            INSERT INTO usuarios (id_usuario, nombre) VALUES \n            (1, 'Alex'), (2, 'Maria'), (3, 'Juan'), (4, 'Sofia');\n            \n            INSERT INTO catalogo (id_peli, titulo, minutos) VALUES \n            (101, 'Matrix', 136), (102, 'Shrek', 90), (103, 'Inception', 148), (104, 'Avatar', 162);\n            \n            INSERT INTO historial_vistas (id_vista, id_usuario, id_peli) VALUES \n            (1, 1, 101), (2, 1, 102), -- Alex: 226 min\n            (3, 2, 103), (4, 2, 104), (5, 2, 101), -- Maria: 446 min\n            (6, 3, 102), -- Juan: 90 min\n            (7, 4, 104), (8, 4, 103); -- Sofia: 310 min\n        ",
     "query_defectuoso": "SELECT usuarios.nombre, SUM(catalogo.minutos) FROM usuarios INNER JOIN historial_vistas ON usuarios.id_usuario = historial_vistas.id_usuario INNER JOIN catalogo ON historial_vistas.id_peli = catalogo.id_peli GROUP BY usuarios.nombre ORDER BY SUM(catalogo.minutos) LIMIT 3 DESC;",
     "expected_query": "SELECT usuarios.nombre, SUM(catalogo.minutos) FROM usuarios INNER JOIN historial_vistas ON usuarios.id_usuario = historial_vistas.id_usuario INNER JOIN catalogo ON historial_vistas.id_peli = catalogo.id_peli GROUP BY usuarios.nombre ORDER BY SUM(catalogo.minutos) DESC LIMIT 3;",
@@ -301,7 +301,7 @@ export const LEVELS = [
     "db_name": "banco.db",
     "dificultad": "Experto",
     "modalidad": "Terminal",
-    "briefing_mision": "[Banco] El jefe final: 4 Tablas. Muestra el 'nombre' del cliente y el total de 'monto' de sus transacciones. Debes hacer JOIN desde 'clientes' hasta 'sucursales', luego 'cuentas' y finalmente 'transacciones', agrupando por nombre del cliente.",
+    "briefing_mision": "[Banco] El jefe final: 4 Tablas. Muestra el 'nombre' del cliente y el total de 'monto' de sus transacciones. Encadena 3 INNER JOIN: clientes → sucursales → cuentas → transacciones, agrupando por nombre del cliente.",
     "init_db_sql": "\n            CREATE TABLE clientes (\n                id_cliente INTEGER PRIMARY KEY,\n                nombre TEXT NOT NULL\n            );\n            CREATE TABLE sucursales (\n                id_sucursal INTEGER PRIMARY KEY,\n                id_cliente INTEGER NOT NULL,\n                ciudad TEXT NOT NULL,\n                FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)\n            );\n            CREATE TABLE cuentas (\n                id_cuenta INTEGER PRIMARY KEY,\n                id_sucursal INTEGER NOT NULL,\n                tipo_cuenta TEXT NOT NULL,\n                FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal)\n            );\n            CREATE TABLE transacciones (\n                id_tx INTEGER PRIMARY KEY,\n                id_cuenta INTEGER NOT NULL,\n                monto INTEGER NOT NULL,\n                FOREIGN KEY (id_cuenta) REFERENCES cuentas(id_cuenta)\n            );\n            \n            INSERT INTO clientes (id_cliente, nombre) VALUES (1, 'TechCorp Inc.'), (2, 'GlobalMedia');\n            \n            INSERT INTO sucursales (id_sucursal, id_cliente, ciudad) VALUES \n            (10, 1, 'Madrid'), (11, 1, 'Barcelona'), (12, 2, 'Valencia');\n            \n            INSERT INTO cuentas (id_cuenta, id_sucursal, tipo_cuenta) VALUES \n            (100, 10, 'Corriente'), (101, 11, 'Ahorro'), (102, 12, 'Corriente');\n            \n            INSERT INTO transacciones (id_tx, id_cuenta, monto) VALUES \n            (1000, 100, 5000), (1001, 100, 2500), \n            (1002, 101, 10000), \n            (1003, 102, 8000), (1004, 102, 2000);\n        ",
     "expected_query": "SELECT clientes.nombre, SUM(transacciones.monto) FROM clientes INNER JOIN sucursales ON clientes.id_cliente = sucursales.id_cliente INNER JOIN cuentas ON sucursales.id_sucursal = cuentas.id_sucursal INNER JOIN transacciones ON cuentas.id_cuenta = transacciones.id_cuenta GROUP BY clientes.nombre;",
     "solution_data": [
@@ -401,7 +401,7 @@ export const LEVELS = [
     "db_name": "restaurante.db",
     "dificultad": "Intermedio",
     "modalidad": "Auditoría",
-    "briefing_mision": "[Restaurante] El sistema de órdenes falló. Un programador usó una palabra reservada ('table') como nombre para la tabla de mesas del restaurante. Encuentra y haz clic en el error.",
+    "briefing_mision": "[Restaurante] El sistema de órdenes falló. Un programador usó la palabra reservada 'table' para referirse a la tabla que en la base de datos real se llama 'mesas'. Encuentra y haz clic en el error.",
     "init_db_sql": "\n            CREATE TABLE mesas (\n                id_mesa INTEGER PRIMARY KEY,\n                capacidad INTEGER NOT NULL\n            );\n        ",
     "audit_tokens": [
       "SELECT ",
@@ -436,7 +436,7 @@ export const LEVELS = [
     "db_name": "red_social.db",
     "dificultad": "Intermedio",
     "modalidad": "Ensamblaje",
-    "briefing_mision": "[Red Social] Un usuario nuevo se ha registrado. Ensambla los bloques para INSERTAR al usuario 'bob' y luego SELECCIONARLO para verificar.",
+    "briefing_mision": "[Red Social] Un usuario nuevo se ha registrado. Ensambla los bloques para INSERTAR al usuario 'bob' y luego selecciónalo para comprobar que se insertó correctamente.",
     "init_db_sql": "\n            CREATE TABLE usuarios (\n                username TEXT PRIMARY KEY,\n                seguidores INTEGER\n            );\n            INSERT INTO usuarios (username, seguidores) VALUES ('alice', 500);\n        ",
     "dnd_blocks": [
       "INSERT INTO usuarios",
@@ -519,7 +519,7 @@ export const LEVELS = [
     "db_name": "biblioteca.db",
     "dificultad": "Intermedio",
     "modalidad": "Depuración",
-    "briefing_mision": "[Biblioteca] La búsqueda de libros no funciona. Queremos encontrar cualquier libro que contenga la palabra 'Magia' en su título, pero los comodines '%' del LIKE están mal puestos. ¡Arréglalo!",
+    "briefing_mision": "[Biblioteca] La búsqueda de libros no funciona. Queremos encontrar cualquier libro que contenga la palabra 'Magia' en su título, pero los comodines '%' del LIKE están mal puestos. Corrige la consulta para que encuentre la palabra en cualquier parte del título.",
     "init_db_sql": "\n            CREATE TABLE libros (id INT, titulo TEXT);\n            INSERT INTO libros VALUES (1, 'La Magia Oscura'), (2, 'Matemáticas Básicas'), (3, 'Trucos de Magia'), (4, 'Historia Universal');\n        ",
     "query_defectuoso": "SELECT titulo FROM libros WHERE titulo LIKE 'Magia%';",
     "expected_query": "SELECT titulo FROM libros WHERE titulo LIKE '%Magia%';",
@@ -552,7 +552,7 @@ export const LEVELS = [
     "db_name": "concesionario.db",
     "dificultad": "Avanzado",
     "modalidad": "Depuración",
-    "briefing_mision": "[Concesionario] Queremos ver el precio promedio (AVG) de los autos por cada marca. La consulta da error porque olvidaron agrupar los resultados. ¡Añade la cláusula faltante al final!",
+    "briefing_mision": "[Concesionario] Queremos ver el precio promedio (AVG) de los autos por cada marca. La consulta devuelve una sola fila con el promedio de todas las marcas mezcladas porque olvidaron agrupar los resultados. ¡Añade la cláusula faltante al final para obtener un promedio por marca!",
     "init_db_sql": "\n            CREATE TABLE autos (id INT, marca TEXT, precio INT);\n            INSERT INTO autos VALUES (1, 'Ford', 20000), (2, 'Ford', 25000), (3, 'Toyota', 22000), (4, 'Toyota', 24000);\n        ",
     "query_defectuoso": "SELECT marca, AVG(precio) FROM autos;",
     "expected_query": "SELECT marca, AVG(precio) FROM autos GROUP BY marca;",
@@ -624,7 +624,7 @@ export const LEVELS = [
     "db_name": "universidad.db",
     "dificultad": "Experto",
     "modalidad": "Terminal",
-    "briefing_mision": "[Universidad] Jefe Final 2: Subconsultas. Selecciona el 'nombre' de los alumnos cuya 'calificacion' sea MAYOR al promedio general de todos los alumnos. (Pista: usa WHERE calificacion > (SELECT AVG(calificacion) FROM alumnos) ).",
+    "briefing_mision": "[Universidad] Jefe Final 2: Subconsultas. Selecciona el 'nombre' de los alumnos cuya 'calificacion' sea MAYOR QUE el promedio general de todos los alumnos. (Pista: usa WHERE calificacion > (SELECT AVG(calificacion) FROM alumnos) ).",
     "init_db_sql": "\n            CREATE TABLE alumnos (id INT, nombre TEXT, calificacion INT);\n            INSERT INTO alumnos VALUES (1, 'Luis', 6), (2, 'Marta', 9), (3, 'Pedro', 7), (4, 'Julia', 10);\n        ",
     "expected_query": "SELECT nombre FROM alumnos WHERE calificacion > (SELECT AVG(calificacion) FROM alumnos);",
     "solution_data": [
@@ -690,7 +690,7 @@ export const LEVELS = [
     "db_name": "soporte_it.db",
     "dificultad": "Intermedio",
     "modalidad": "Depuración",
-    "briefing_mision": "[Soporte IT] La consulta intenta mostrar el ticket y quién lo atiende. Si el asignado es nulo, debe decir 'Sin Asignar'. Arregla la función COALESCE (recibe dos parámetros).",
+    "briefing_mision": "[Soporte IT] La consulta intenta mostrar el ticket y quién lo atiende. Si el asignado es nulo, debe decir 'Sin Asignar'. Corrige la función COALESCE: recibe dos parámetros.",
     "init_db_sql": "CREATE TABLE tickets (id INT, asignado TEXT); INSERT INTO tickets VALUES (1, 'Admin'), (2, NULL);",
     "query_defectuoso": "SELECT id, COALESCE(asignado) FROM tickets;",
     "expected_query": "SELECT id, COALESCE(asignado, 'Sin Asignar') FROM tickets;",
@@ -766,7 +766,7 @@ export const LEVELS = [
     "db_name": "directorio.db",
     "dificultad": "Avanzado",
     "modalidad": "Terminal",
-    "briefing_mision": "[Directorio] Concatena nombre y apellido con un espacio entre ellos ('nombre || \\' \\' || apellido') y conviértelo a MAYÚSCULAS usando UPPER(). Extrae solo eso.",
+    "briefing_mision": "[Directorio] Concatena nombre y apellido con un espacio entre ellos ('nombre || \\' \\' || apellido') y conviértelo a MAYÚSCULAS usando UPPER(). Extrae únicamente esa columna resultante (el nombre completo en mayúsculas).",
     "init_db_sql": "CREATE TABLE gente (nombre TEXT, apellido TEXT); INSERT INTO gente VALUES ('john', 'doe'), ('jane', 'smith');",
     "expected_query": "SELECT UPPER(nombre || ' ' || apellido) FROM gente;",
     "solution_data": [
@@ -798,7 +798,7 @@ export const LEVELS = [
     "db_name": "calificaciones.db",
     "dificultad": "Avanzado",
     "modalidad": "Depuración",
-    "briefing_mision": "[Calificaciones] Corrige la sintaxis del CASE WHEN. Falta la palabra clave que cierra y finaliza el bloque lógico.",
+    "briefing_mision": "[Calificaciones] Corrige la sintaxis del CASE WHEN. Falta la palabra clave que cierra y finaliza el bloque lógico. Corrige la consulta.",
     "init_db_sql": "CREATE TABLE notas (alumno TEXT, nota INT); INSERT INTO notas VALUES ('Leo', 90), ('Mia', 50);",
     "query_defectuoso": "SELECT alumno, CASE WHEN nota >= 60 THEN 'Aprobado' ELSE 'Reprobado' FROM notas;",
     "expected_query": "SELECT alumno, CASE WHEN nota >= 60 THEN 'Aprobado' ELSE 'Reprobado' END FROM notas;",
@@ -913,7 +913,7 @@ export const LEVELS = [
     "db_name": "suscripciones.db",
     "dificultad": "Experto",
     "modalidad": "Terminal",
-    "briefing_mision": "[Suscripciones] Lista 'nombre' del cliente y su 'plan' de suscripción. Usa LEFT JOIN para que los clientes SIN suscripción también aparezcan (su plan se mostrará vacío).",
+    "briefing_mision": "[Suscripciones] Lista 'nombre' del cliente y su 'plan' de suscripción. Usa LEFT JOIN para que los clientes SIN suscripción también aparezcan (su plan se mostrará como NULL en el resultado).",
     "init_db_sql": "CREATE TABLE cl (id INT, nombre TEXT); CREATE TABLE sub (id_cl INT, plan TEXT); INSERT INTO cl VALUES (1, 'Sam'), (2, 'Tim'); INSERT INTO sub VALUES (1, 'Pro');",
     "expected_query": "SELECT cl.nombre, sub.plan FROM cl LEFT JOIN sub ON cl.id = sub.id_cl;",
     "solution_data": [
@@ -954,7 +954,7 @@ export const LEVELS = [
     "db_name": "hoteles.db",
     "dificultad": "Experto",
     "modalidad": "Depuración",
-    "briefing_mision": "[Hoteles] Busca las reservas que ocurran HOY o en el futuro. Debes reemplazar 'HOY' por la función DATE('now') para obtener la fecha actual dinámica del sistema.",
+    "briefing_mision": "[Hoteles] Busca las reservas que ocurran HOY o en el futuro. Debes reemplazar 'HOY' por la función DATE('now') para obtener la fecha actual dinámica del sistema. Corrige la consulta.",
     "init_db_sql": "CREATE TABLE reservas (habitacion INT, fecha TEXT); INSERT INTO reservas VALUES (101, '2010-12-31'), (102, '2050-05-10');",
     "query_defectuoso": "SELECT habitacion FROM reservas WHERE fecha >= 'HOY';",
     "expected_query": "SELECT habitacion FROM reservas WHERE fecha >= DATE('now');",
@@ -1009,7 +1009,7 @@ export const LEVELS = [
     "learning_resources": [
       {
         "title": "NOT EXISTS",
-        "desc": "WHERE NOT EXISTS (subconsulta) filtra registros donde la subconsulta correlacionada no arroje ni un solo resultado."
+        "desc": "`WHERE NOT EXISTS (subconsulta)` conserva solo los registros cuya subconsulta no devuelve ninguna fila."
       }
     ]
   }

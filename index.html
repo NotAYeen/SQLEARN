@@ -8,6 +8,9 @@
     <meta name="keywords" content="SQL, SQL simulator, aprender SQL, consultas SQL, SQLite, WebAssembly, práctica SQL interactiva, base de datos">
     <meta name="author" content="notayeen">
     <meta name="theme-color" content="#2b5b5c">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     
     <!-- Meta Canónica -->
     <link rel="canonical" href="https://notayeen.github.io/SQLEARN/">
@@ -17,12 +20,13 @@
     <meta property="og:url" content="https://notayeen.github.io/SQLEARN/">
     <meta property="og:title" content="SQL Practice Simulator | Aprende y Practica SQL Interactivamente">
     <meta property="og:description" content="Aprende y practica consultas SQL en tiempo real directamente en tu navegador con SQLite y WebAssembly.">
-    <meta property="og:image" content="https://notayeen.github.io/SQLEARN/css/preview.png">
+    <meta property="og:image" content="https://notayeen.github.io/SQLEARN/preview.png">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SQL Practice Simulator">
     <meta name="twitter:description" content="Aprende y practica consultas SQL en tiempo real directamente en tu navegador.">
+    <meta name="twitter:image" content="https://notayeen.github.io/SQLEARN/preview.png">
 
     <!-- Carga No Bloqueante de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,6 +74,9 @@
                     <button class="nav-btn" id="btn-theme-toggle" title="Cambiar Tema" aria-label="Cambiar Tema Claro u Oscuro">
                         <i class="ph ph-sun" aria-hidden="true"></i>
                     </button>
+                    <button class="nav-btn" id="btn-mute" title="Activar o desactivar sonido" aria-label="Activar o desactivar sonido">
+                        <i class="ph-fill ph-speaker-high" aria-hidden="true"></i>
+                    </button>
                     <button class="nav-btn" id="btn-settings" aria-label="Abrir ajustes del simulador">Ajustes</button>
                     <button class="nav-btn" id="btn-contact" aria-label="Información de contacto">Contacto</button>
                 </div>
@@ -83,6 +90,10 @@
                 <button class="nav-btn btn-run" id="btn-run" aria-label="Ejecutar consulta SQL">
                     <span>Ejecutar</span>
                     <i class="ph-fill ph-play" aria-hidden="true"></i>
+                </button>
+                <button class="nav-btn btn-reset-db" id="btn-reset-db" aria-label="Reiniciar la base de datos de la misión actual" title="Reiniciar la base de datos de la misión actual">
+                    <i class="ph-fill ph-arrows-clockwise" aria-hidden="true"></i>
+                    <span class="reset-label">Reiniciar BD</span>
                 </button>
             </div>
         </nav>
@@ -143,7 +154,7 @@
                     <div class="dnd-blocks-target" id="dnd-blocks-target" title="Suelta los bloques aquí"></div>
                 </div>
 
-                <div class="resizer" id="vertical-resizer" aria-label="Separador de tamaño de paneles"></div>
+                <div class="resizer" id="vertical-resizer" role="separator" aria-orientation="horizontal" aria-label="Ajustar la altura del editor"></div>
                 
                 <!-- Results -->
                 <section class="results-panel" id="results-panel" aria-live="polite" aria-label="Resultados de la consulta SQL">
@@ -173,6 +184,11 @@
                     <div class="table-info-list" id="table-info-content"></div>
                 </div>
 
+                <div class="sidebar-section" id="expected-panel" style="display:none;">
+                    <h2 class="section-title text-center">Salida Esperada</h2>
+                    <table class="expected-table" id="expected-table"></table>
+                </div>
+
                 </div>
             </aside>
         </div>
@@ -183,7 +199,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/sql-hint.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/sql-wasm.js" defer></script>
 
     <!-- CUSTOM MODAL -->
     <div id="retro-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="retro-modal-title">
