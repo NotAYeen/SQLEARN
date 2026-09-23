@@ -561,6 +561,13 @@ li.CodeMirror-hint-active {
     outline: 2px solid #ffcc00;
     outline-offset: 1px;
 }
+.audit-token.solution-reveal {
+    background-color: #ffcc00;
+    color: #1a1a1a;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 1px #1a1a1a;
+    font-weight: bold;
+}
 .audit-token.error-found {
     background-color: #c62828;
     color: #ffffff;

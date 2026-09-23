@@ -148,4 +148,65 @@ export class DndManager {
     updateEditorFromDropzone() {
         this.app.setEditorQuiet(this.getQuery());
     }
+
+    applySolution(expectedQuery) {
+        if (!expectedQuery) return false;
+        const sourceEl = document.getElementById('dnd-source');
+        const targetEl = document.getElementById('dnd-target');
+        if (!sourceEl || !targetEl) return false;
+
+        const norm = (s) => String(s)
+            .replace(/\s+/g, ' ')
+            .replace(/\s*([;,.)])\s*/g, '$1')
+            .trim()
+            .toLowerCase();
+
+        const expected = norm(expectedQuery);
+        const blocks = Array.from(sourceEl.querySelectorAll('.dnd-block'))
+            .concat(Array.from(targetEl.querySelectorAll('.dnd-block')))
+            .map(el => el.textContent);
+
+        const order = this.findSolutionOrder(blocks, expected, norm);
+        if (!order) return false;
+
+        sourceEl.innerHTML = "";
+        targetEl.innerHTML = "";
+        order.forEach(block => {
+            targetEl.appendChild(this.createItem(block, 'remove'));
+        });
+        this.syncAll();
+        this.updateEditorFromDropzone();
+        return true;
+    }
+
+    findSolutionOrder(blocks, expected, norm) {
+        const n = blocks.length;
+        if (n === 0 || n > 8) return null;
+
+        const used = new Array(n).fill(false);
+        const perm = [];
+        let found = null;
+
+        const backtrack = () => {
+            if (found) return;
+            if (perm.length === n) {
+                const joined = perm.map(i => blocks[i]).join(' ');
+                if (norm(joined) === expected) found = perm.slice();
+                return;
+            }
+            for (let i = 0; i < n; i++) {
+                if (used[i]) continue;
+                used[i] = true;
+                perm.push(i);
+                backtrack();
+                perm.pop();
+                used[i] = false;
+                if (found) return;
+            }
+        };
+        backtrack();
+
+        if (!found) return null;
+        return found.map(i => blocks[i]);
+    }
 }

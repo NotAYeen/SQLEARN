@@ -153,7 +153,16 @@ export class App {
 
         document.getElementById("btn-solution")?.addEventListener("click", () => {
             const level = this.loader.getLevel(this.currentLevelIndex);
-            if (level && level.expected_query) {
+            if (!level) return;
+            const modalidad = level.modalidad || "";
+            if (modalidad === "Audit" || modalidad === "Auditoría") {
+                this.revealAuditSolution(level);
+            } else if (modalidad === "DND" || modalidad === "Ensamblaje") {
+                const ok = this.dndManager.applySolution(level.expected_query);
+                if (!ok && level.expected_query) {
+                    this.showModal("Solución", level.expected_query, null, false);
+                }
+            } else if (level.expected_query) {
                 this.setEditorQuiet(level.expected_query);
             }
         });
@@ -622,6 +631,20 @@ export class App {
             };
             area.appendChild(span);
         });
+    }
+
+    revealAuditSolution(level) {
+        const area = document.getElementById("audit-code-area");
+        if (!area || area.dataset.solved === "true") return;
+        if (!Array.isArray(level.audit_tokens)) return;
+        const token = area.querySelector(`.audit-token[data-index="${level.token_error_index}"]`);
+        if (token) token.classList.add("solution-reveal");
+        this.showModal(
+            "Solución (Auditoría)",
+            "El fragmento marcado en dorado contiene el error.\n\n" + (level.explicacion || ""),
+            null,
+            false
+        );
     }
 
     checkAudit(level, selectedIndex) {
