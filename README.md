@@ -57,6 +57,15 @@ Si deseas modificar los archivos fuente (ubicados en `src/`) y compilar tus prop
    npm run build
    ```
 
+### Calidad y validación
+
+Antes de subir cambios conviene ejecutar el validador y los tests:
+
+* **`npm run validate`** — Ejecuta cada nivel contra un motor SQLite real (`sql.js`) y comprueba que `init_db_sql`, `expected_query`, `solution_data`, los tokens de auditoría y los bloques Drag & Drop son consistentes.
+* **`npm test`** — Tests unitarios (Vitest) del comparador de respuestas y de la validación de los 25 niveles.
+
+El CI (GitHub Actions) ejecuta `validate`, `test` y `build`, y falla si el `bundle.js` commiteado no está actualizado, para evitar divergencias entre fuente y artefacto desplegado.
+
 ---
 
 ## 🎯 Controles y Atajos

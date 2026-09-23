@@ -20,8 +20,5 @@ export default defineConfig({
         name: 'SqlApp'
       }
     }
-  },
-  esbuild: {
-    drop: ['console', 'debugger']
   }
 });
