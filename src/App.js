@@ -680,7 +680,18 @@ export class App {
         const sql = this.editor.getValue();
         if (!sql.trim()) return;
 
-        const res = this.db.executeQuery(sql);
+        // Ejecutar en transacción y revertir: cada "Ejecutar" evalúa contra la BD
+        // prístina del nivel, así las consultas DML son idempotentes y la validación
+        // no depende del estado acumulado entre intentos (evita UNIQUE/duplicados).
+        const db = this.db.db;
+        try { db.exec("BEGIN"); } catch (e) { /* ignore */ }
+
+        let res;
+        try {
+            res = this.db.executeQuery(sql);
+        } finally {
+            try { db.exec("ROLLBACK"); } catch (e) { /* ignore */ }
+        }
 
         if (res.error) {
             AudioFX.error();
