@@ -6,7 +6,7 @@
     --text-primary: #000000;
     --text-secondary: #222222; /* High contrast text */
     
-    --header-bg: linear-gradient(90deg, #0000a0, #1084d0);
+    --header-bg: linear-gradient(90deg, #0000a0, #1069b4); /* white on #1069b4 = 5.67:1 */
     --header-text: #ffffff;
     
     --border-light: #ffffff;
@@ -17,6 +17,35 @@
     
     --font-ui: 'Tahoma', 'MS Sans Serif', Arial, sans-serif;
     --font-mono: 'Source Code Pro', 'Courier New', monospace;
+
+    /* Spacing & shape scale (see DESIGN.md) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --radius: 2px;
+
+    /* Surface: lists, tables, code areas. Was hardcoded #fff/#1a1a1a in 8 places */
+    --bg-surface: #ffffff;
+    --text-on-surface: #000000;
+
+    /* El anillo de foco y el relleno dorado son dos trabajos distintos.
+       Relleno (--accent-highlight) siempre lleva texto casi negro encima:
+       11.5:1. Anillo (--accent-focus) tiene que verse SOBRE el panel, y el oro
+       claro da 1.12:1 contra #dfdfd1, asi que en tema claro el anillo es un
+       dorado oscuro (5.9:1). Mismo color de familia, valor correcto. */
+    --accent-highlight: #ffcc00;
+    --accent-focus: #7a4300;
+    --focus-outline: 2px solid var(--accent-focus);
+
+    /* Semantic state colors */
+    --color-error: #c62828;
+    --color-error-wrong: #7a5a00;
+    --color-success: #006400;
+
+    /* Scrollbar thumb needs 3:1 against the panel: it is a UI component */
+    --scrollbar-thumb: #7f7f70;
+    --scrollbar-thumb-hover: #6b6b5d;
 }
 
 /* Accessibility Utility Class */
@@ -48,6 +77,18 @@
     --border-dark-shadow: #000000;
 
     --accent-run: #4caf50;
+
+    --bg-surface: #1a1a1a;
+    --text-on-surface: #e0e0e0;
+
+    --color-error: #ef5350;
+    --color-success: #4caf50;
+
+    --scrollbar-thumb: #7a7a7a;
+    --scrollbar-thumb-hover: #8a8a8a;
+
+    /* En oscuro el oro claro si funciona como anillo: 8.98:1 sobre el panel. */
+    --accent-focus: #ffcc00;
 }
 
 * {
@@ -69,7 +110,7 @@ body {
 
 /* Accessible Focus States */
 :focus-visible {
-    outline: 2px solid #ffcc00;
+    outline: var(--focus-outline);
     outline-offset: 1px;
 }
 
@@ -81,20 +122,16 @@ body {
     border-left: 1px solid var(--border-shadow);
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #bdbdad;
+    /* 3.02:1 contra --bg-panel. El thumb es un componente de UI, no adorno:
+       por eso no puede ser un gris claro del mismo tono que el panel. */
+    background-color: var(--scrollbar-thumb);
     box-shadow: inset 1px 1px 0px var(--border-light), 
                 inset -1px -1px 0px var(--border-dark-shadow),
                 inset 2px 2px 0px var(--border-light), 
                 inset -2px -2px 0px var(--border-shadow);
 }
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background-color: #4a4a4a;
-}
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #a5a595;
-}
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background-color: #5a5a5a;
+    background-color: var(--scrollbar-thumb-hover);
 }
 ::-webkit-scrollbar-button {
     display: none;
@@ -191,7 +228,7 @@ body {
 .nav-btn-mini:focus-visible,
 .mobile-tab-btn:focus-visible,
 .retro-modal-close:focus-visible {
-    outline: 2px solid #ffcc00;
+    outline: var(--focus-outline);
     outline-offset: 2px;
 }
 
@@ -264,24 +301,20 @@ body {
     background-color: var(--bg-panel);
 }
 
-.text-center {
-    text-align: left; /* Windows 95 titles were usually left-aligned */
-}
+/* Las barras de título del Win95 se alineaban a la izquierda, no al centro.
+   El nombre "text-center" mentía sobre lo que hacía: eliminado de style.css y
+   de los 5 encabezados de index.html. */
 
 /* SCHEMA LIST */
 .schema-list {
     list-style: none;
     margin: 0;
     padding: 4px;
-    background-color: #ffffff; /* Classic white for lists in retro os */
-    color: #000000;
+    background-color: var(--bg-surface); /* Classic white for lists in retro os */
+    color: var(--text-on-surface);
     border: 2px solid;
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
     margin: 4px;
-}
-[data-theme="dark"] .schema-list {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
 }
 
 .schema-table-name {
@@ -305,7 +338,61 @@ body {
     color: var(--text-primary);
 }
 
-/* EDITOR */
+/* Anidamiento de listas de esquema y docs: sin borde propio, no es una
+   ventana dentro de otra ventana. Antes se quitaba con style.border="none". */
+.schema-list-nested {
+    border: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+.schema-list-nested .schema-column {
+    padding-left: 24px;
+}
+
+/* Fila de enciclopedia: es accion, no texto, asi que lleva rol, foco y cursor. */
+.docs-item {
+    cursor: pointer;
+}
+.docs-item:hover,
+.docs-item:focus-visible {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Pistas del nivel */
+.hint-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-1) var(--space-2) var(--space-1) 24px;
+    font-size: 12px;
+}
+.hint-item-title {
+    font-weight: bold;
+    margin-bottom: var(--space-1);
+    color: var(--text-primary);
+}
+.hint-item-desc {
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--text-secondary);
+}
+
+/* Cabecera de mision */
+.mission-title {
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+.mission-text-body {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* EDITOR
 .editor-container {
     flex: 1 1 auto;
     min-height: 200px;
@@ -326,9 +413,11 @@ body {
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
 }
 
-/* RESIZER */
+/* RESIZER
+   role="separator" promete operacion con flechas; setupResizer() la implementa.
+   Sin el anillo de foco, un separator con tabindex es un control invisible. */
 .resizer {
-    height: 6px;
+    height: 8px;
     background-color: var(--bg-panel);
     cursor: row-resize;
     position: relative;
@@ -336,10 +425,70 @@ body {
     box-shadow: inset 1px 1px 0px var(--border-light), 
                 inset -1px -1px 0px var(--border-dark-shadow);
 }
+.resizer::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 2px;
+    background-color: var(--border-shadow);
+}
+.resizer:hover::after,
+.resizer:focus-visible::after {
+    background-color: var(--accent-highlight);
+}
+.resizer:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: -1px;
+}
+
+/* TABLE INFO CARDS
+   Estas reglas sustituyen a ~40 declaraciones style=... en App.js, que se
+   saltaban los tokens y no respondian a los cambios de tema. */
+.table-info-card {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-shadow);
+    font-size: 12px;
+}
+.table-info-name {
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+.table-info-table {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+.table-info-count {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+.column-badge-row {
+    margin-top: var(--space-1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+}
+.column-badge {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-shadow);
+    padding: 1px 4px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+}
+.sidebar-empty {
+    padding: 6px 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
 
 /* RESULTS PANEL */
 .results-panel {
-    height: 250px;
+    /* clamp: en un movil de 640px, 250px fijos empujaban la tabla fuera de pantalla */
+    height: clamp(160px, 38vh, 250px);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -360,11 +509,83 @@ body {
     height: 100%;
     color: var(--text-secondary);
     text-align: center;
-    background-color: #ffffff;
+    background-color: var(--bg-surface);
+    color: var(--text-on-surface);
     border: 2px solid;
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
 }
-[data-theme="dark"] .placeholder-msg { background-color: #1a1a1a; }
+
+/* Estado de carga y de error de arranque. Antes, si fetchAllLevels() o db.init()
+   fallaban, el catch solo hacia console.error y el usuario se quedaba mirando
+   el literal "Cargando mision..." con el editor muerto, sin salida. */
+.boot-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background-color: var(--bg-desktop);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    text-align: center;
+    color: var(--text-primary);
+}
+.boot-overlay.hidden {
+    display: none;
+}
+.boot-title {
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    /* El overlay se dibuja sobre --bg-desktop en ambos temas, asi que el
+       texto va en color claro fijo: 7.6:1 y 16:1 respectivamente. */
+    color: #ffffff;
+}
+.boot-status {
+    font-size: 13px;
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: var(--space-1) var(--space-3);
+    max-width: 90vw;
+}
+.boot-detail {
+    font-size: 12px;
+    color: var(--text-primary);
+    background-color: var(--bg-panel);
+    padding: var(--space-2) var(--space-3);
+    max-width: min(520px, 92vw);
+    text-align: left;
+    line-height: 1.5;
+    border: 2px solid var(--color-error);
+    font-family: var(--font-mono);
+    word-break: break-word;
+}
+.boot-hint {
+    font-size: 12px;
+    color: #ffffff;
+    max-width: 90vw;
+}
+
+/* Fila de error SQL: se renderiza dentro de la tabla de resultados, pero no
+   puede parecerse a un dato. Rojo, monoespaciado, con icono. */
+.error-row td {
+    background-color: var(--color-error);
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.5;
+    text-align: left;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+.error-row td::before {
+    content: "Error: ";
+    font-weight: bold;
+}
 
 .placeholder-msg h2 {
     font-size: 24px;
@@ -380,11 +601,10 @@ body {
 .results-content-wrapper {
     height: 100%;
     overflow: auto;
-    background-color: #ffffff;
+    background-color: var(--bg-surface);
     border: 2px solid;
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
 }
-[data-theme="dark"] .results-content-wrapper { background-color: #1a1a1a; }
 
 table {
     width: 100%;
@@ -396,9 +616,8 @@ th, td {
     padding: 6px;
     font-size: 13px;
     text-align: left;
-    color: #000000;
+    color: var(--text-on-surface);
 }
-[data-theme="dark"] th, [data-theme="dark"] td { color: #e0e0e0; }
 
 th {
     background-color: var(--bg-panel);
@@ -436,34 +655,22 @@ th {
     padding: 8px;
     font-size: 13px;
     color: var(--text-primary);
-    background-color: #ffffff;
+    background-color: var(--bg-surface);
+    color: var(--text-on-surface);
     border: 2px solid;
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
-    margin: 4px;
+    margin: var(--space-1);
 }
-[data-theme="dark"] .table-info-list { background-color: #1a1a1a; color: #e0e0e0; }
 
-.expected-output-wrapper {
-    padding: 4px;
-    background-color: var(--bg-panel);
-    overflow-x: auto;
-    max-height: 220px;
-    overflow-y: auto;
-    border: 1px solid var(--border-shadow);
-}
 .expected-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #ffffff;
-    color: #000000;
+    background-color: var(--bg-surface);
+    color: var(--text-on-surface);
     font-size: 11px;
     font-family: var(--font-mono);
     border: 2px solid;
     border-color: var(--border-shadow) var(--border-light) var(--border-light) var(--border-shadow);
-}
-[data-theme="dark"] .expected-table {
-    background-color: #1a1a1a;
-    color: #ffffff;
 }
 .expected-table th, .expected-table td {
     padding: 4px 8px;
@@ -485,18 +692,14 @@ th {
 
 /* HINTING (AUTOCOMPLETE) CSS OVERRIDES FOR RETRO */
 .CodeMirror-hints {
-    background-color: #ffffff !important;
+    background-color: var(--bg-surface) !important;
     border: 2px solid !important;
     border-color: var(--border-shadow) var(--border-dark-shadow) var(--border-dark-shadow) var(--border-shadow) !important;
     font-family: var(--font-ui) !important;
     font-size: 13px !important;
-    color: #000 !important;
+    color: var(--text-on-surface) !important;
     box-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important;
     padding: 0 !important;
-}
-[data-theme="dark"] .CodeMirror-hints {
-    background-color: #1a1a1a !important;
-    color: #e0e0e0 !important;
 }
 .CodeMirror-hint {
     padding: 4px 8px !important;
@@ -531,8 +734,8 @@ li.CodeMirror-hint-active {
 
 .audit-code {
     border: 2px inset var(--border-shadow);
-    background-color: #ffffff;
-    color: #111111;
+    background-color: var(--bg-surface);
+    color: var(--text-on-surface);
     padding: 14px 16px;
     font-size: 15px;
     line-height: 2;
@@ -541,8 +744,6 @@ li.CodeMirror-hint-active {
     box-shadow: 1px 1px 0 var(--border-light);
 }
 [data-theme="dark"] .audit-code {
-    background-color: #111111;
-    color: #eeeeee;
     border-color: #333333;
 }
 
@@ -558,27 +759,31 @@ li.CodeMirror-hint-active {
 }
 .audit-token:hover { background-color: var(--bg-hover); }
 .audit-token:focus-visible {
-    outline: 2px solid #ffcc00;
+    outline: var(--focus-outline);
     outline-offset: 1px;
 }
+/* El anillo de foco es el mismo oro que el fondo del token revelado: sobre
+   dorado un anillo dorado es invisible (1:1). Aquí el anillo pasa a oscuro. */
+.audit-token.solution-reveal:focus-visible {
+    outline-color: #1a1a1a;
+}
 .audit-token.solution-reveal {
-    background-color: #ffcc00;
+    background-color: var(--accent-highlight);
     color: #1a1a1a;
     border-color: #1a1a1a;
     box-shadow: 0 0 0 1px #1a1a1a;
     font-weight: bold;
 }
 .audit-token.error-found {
-    background-color: #c62828;
+    background-color: var(--color-error);
     color: #ffffff;
     border-color: #ffd54f;
     text-decoration: underline wavy #ffd54f;
     text-underline-offset: 3px;
     font-weight: bold;
 }
-.audit-token.locked { pointer-events: none; opacity: 0.85; }
 .audit-token-wrong {
-    background-color: #7a5a00;
+    background-color: var(--color-error-wrong);
     color: #ffffff;
     text-decoration: line-through;
     animation: shake-token 0.35s ease-in-out 2;
@@ -600,10 +805,10 @@ li.CodeMirror-hint-active {
     padding: 10px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    background-color: #ffffff;
+    gap: var(--space-2);
+    background-color: var(--bg-surface);
+    color: var(--text-on-surface);
 }
-[data-theme="dark"] .dnd-blocks-source, [data-theme="dark"] .dnd-blocks-target { background-color: #1a1a1a; }
 
 .dnd-row {
     display: flex;
@@ -654,15 +859,14 @@ li.CodeMirror-hint-active {
     line-height: 1;
     flex-shrink: 0;
 }
-.dnd-btn:focus-visible { outline: 2px solid #ffcc00; outline-offset: 1px; }
+.dnd-btn:focus-visible { outline: var(--focus-outline); outline-offset: 1px; }
 .dnd-btn:active {
     box-shadow: inset -1px -1px 0px var(--border-light), 
                 inset 1px 1px 0px var(--border-dark-shadow);
 }
-.dnd-btn-add { color: #1b5e20; }
+.dnd-btn-add { color: var(--color-success); }
 .dnd-btn-remove { color: #b71c1c; }
-[data-theme="dark"] .dnd-btn-add { color: #4caf50; }
-[data-theme="dark"] .dnd-btn-remove { color: #ef5350; }
+[data-theme="dark"] .dnd-btn-remove { color: var(--color-error); }
 .dnd-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .truncation-note td {
@@ -691,7 +895,7 @@ li.CodeMirror-hint-active {
     background-color: var(--bg-panel);
     border: 2px solid;
     border-color: var(--border-light) var(--border-dark-shadow) var(--border-dark-shadow) var(--border-light);
-    width: 300px;
+    width: min(300px, 92vw);
     box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
@@ -728,12 +932,17 @@ li.CodeMirror-hint-active {
 }
 
 .retro-modal-body {
-    padding: 16px;
+    padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    text-align: center;
-    font-size: 13px;
+    gap: var(--space-4);
+    /* A la izquierda: los mensajes de confirmacion son frases largas y
+       centradas de 3 palabras por linea se leen peor. */
+    text-align: left;
+    font-size: 13.5px;
+    line-height: 1.5;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 .retro-modal-buttons {
@@ -747,6 +956,16 @@ li.CodeMirror-hint-active {
 }
 
 /* ENCYCLOPEDIA FLOATING WINDOW */
+.retro-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+}
+.retro-backdrop.hidden {
+    display: none;
+}
+
 .retro-window {
     position: fixed;
     top: 50px;
@@ -780,13 +999,15 @@ li.CodeMirror-hint-active {
     max-height: 70vh;
     overflow-y: auto;
 }
+/* El bloque de ejemplo es una terminal: negro en ambos temas, es el
+   unico lugar donde el oscuro es la eleccion y no una falta de token. */
 .docs-example-box {
-    background-color: #000000 !important;
-    color: #ffffff !important;
-    padding: 8px 10px;
+    background-color: #000000;
+    color: #ffffff;
+    padding: var(--space-2) 10px;
     border: 1px solid #444444;
-    border-radius: 2px;
-    margin-top: 4px;
+    border-radius: var(--radius);
+    margin-top: var(--space-1);
 }
 .docs-example-box strong {
     color: #4caf50;
@@ -795,8 +1016,8 @@ li.CodeMirror-hint-active {
 #docs-item-example {
     font-family: var(--font-mono);
     font-size: 12px;
-    color: #ffffff !important;
-    background: transparent !important;
+    color: #ffffff;
+    background: transparent;
     display: inline-block;
     margin-top: 4px;
     line-height: 1.4;
@@ -860,11 +1081,74 @@ li.CodeMirror-hint-active {
     font-weight: bold;
 }
 
+/* ACHIEVEMENT TOASTS
+   Antes: <style> inyectado en runtime + Object.assign(toast.style, {...}) con
+   su propio dorado (#ffd700 / #8b6508), fuera de los tokens. El unico
+   componente que no respondia a los cambios de tema. */
+.toast-container {
+    position: fixed;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 99999;
+}
+.retro-toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+    max-width: min(320px, 88vw);
+    padding: 10px;
+    /* Mismo oro que el foco: un solo dorado en el proyecto. Sobre el dorado,
+       texto casi negro: 14.5:1. */
+    background: var(--accent-highlight);
+    color: #1a1a1a;
+    border: 2px solid #1a1a1a;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-ui);
+    cursor: pointer;
+    animation: slideIn 0.5s ease-out;
+}
+.retro-toast i {
+    font-size: 24px;
+    color: #6b4f04;
+}
+.retro-toast-label {
+    font-weight: bold;
+    font-size: 14px;
+}
+.retro-toast-title {
+    font-size: 12px;
+    font-weight: bold;
+}
+.retro-toast-leaving {
+    animation: slideOut 0.5s ease-in forwards;
+}
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* REDUCED MOTION
+   La animacion de shake y el slide de los toasts son los unicos movimientos
+   del proyecto; los dos se desactivan aqui. Una herramienta de aprendizaje
+   con sacudidas necesita opt-out. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
 /* RESPONSIVE MEDIA QUERIES */
 @media (max-width: 768px) {
-    .desktop-only-btn {
-        display: none !important;
-    }
     .mobile-tab-bar {
         display: flex;
     }
@@ -937,6 +1221,30 @@ li.CodeMirror-hint-active {
     .btn-reset-db .reset-label {
         display: none;
     }
+
+    /* Tap targets del nav superior. En escritorio el biselado de 2 px basta;
+       en movil un boton de 27 px de alto falla el minimo de 44 px. */
+    .top-nav .nav-btn {
+        min-height: 44px;
+    }
+    .top-nav .nav-btn:active {
+        /* El desplazamiento de 2 px del :active de escritorio empuja el
+           contenido fuera del area tactil en movil: aqui solo se hunde. */
+        padding: clamp(3px, 0.5vw, 5px) clamp(8px, 1vw, 14px);
+    }
+    .retro-modal-close {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+    .nav-btn-mini {
+        min-height: 32px;
+        padding: 4px 10px;
+    }
+    .dnd-btn {
+        width: 44px;
+        height: 44px;
+    }
 }
 
 /* MOBILE MISSION BANNER */
@@ -994,16 +1302,22 @@ option {
     border: 1px solid var(--border-shadow);
     text-transform: uppercase;
 }
+/* Los tres badges tienen que distinguirse solos, sin depender del emoji.
+   Antes: #bf360c y #b71c1c, luminancia relativa 1.17 entre sí, indistinguibles.
+   Ahora verde / ámbar / rojo con salto real de luminancia y tono.
+   Contraste del texto: 7.9:1, 6.3:1 y 7.9:1 sobre blanco.
+   Fácil y difícil comparten luminancia a propósito: se distinguen por tono
+   (verde / rojo) y el texto del badge dice la dificultad de todas formas. */
 .badge-easy {
     background-color: #1b5e20;
     color: #ffffff !important;
 }
 .badge-medium {
-    background-color: #bf360c;
+    background-color: #8a5300;
     color: #ffffff !important;
 }
 .badge-hard {
-    background-color: #b71c1c;
+    background-color: #a31515;
     color: #ffffff !important;
 }
 

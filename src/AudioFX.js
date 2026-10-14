@@ -40,5 +40,13 @@ export const AudioFX = {
     error() { 
         this.playTone(200, 'sawtooth', 0.2, 0.1); 
         setTimeout(() => this.playTone(150, 'sawtooth', 0.3, 0.1), 150);
+    },
+    unlock() {
+        // Arpegio corto ascendente: el logro es el unico momento del flujo
+        // donde el tono sube, asi que se distingue del acierto de nivel.
+        this.init();
+        this.playTone(523, 'triangle', 0.12, 0.1);
+        setTimeout(() => this.playTone(784, 'triangle', 0.12, 0.1), 110);
+        setTimeout(() => this.playTone(1046, 'triangle', 0.22, 0.12), 220);
     }
 };

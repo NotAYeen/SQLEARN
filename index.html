@@ -28,11 +28,13 @@
     <meta name="twitter:description" content="Aprende y practica consultas SQL en tiempo real directamente en tu navegador.">
     <meta name="twitter:image" content="https://notayeen.github.io/SQLEARN/preview.png">
 
-    <!-- Carga No Bloqueante de Google Fonts -->
+    <!-- Code font only. Inter was requested here for a long time but never
+         referenced: --font-ui is Tahoma, the literal Win95 UI face. Dropping
+         the request is the fix, not switching the variable. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet"></noscript>
 
     <!-- CSS Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
@@ -61,6 +63,18 @@
     </script>
 </head>
 <body>
+    <!-- Estado de arranque: carga y error. Sin esto, un fallo de CDN dejaba la
+         app muerta con el literal "Cargando mision..." y sin salida. -->
+    <div class="boot-overlay" id="boot-overlay" role="status" aria-live="polite">
+        <div class="boot-title">
+            <span class="brand-tag">SQL</span>
+            <span>Practice Simulator</span>
+        </div>
+        <div class="boot-status" id="boot-status">Cargando el motor SQLite en WebAssembly...</div>
+        <div class="boot-detail hidden" id="boot-detail"></div>
+        <div class="boot-hint" id="boot-hint"></div>
+    </div>
+
     <div class="app-container">
         <!-- TOP NAV -->
         <nav class="top-nav" role="navigation" aria-label="Navegación principal">
@@ -78,7 +92,7 @@
                         <i class="ph-fill ph-speaker-high" aria-hidden="true"></i>
                     </button>
                     <button class="nav-btn" id="btn-settings" aria-label="Abrir ajustes del simulador">Ajustes</button>
-                    <button class="nav-btn" id="btn-contact" aria-label="Información de contacto">Contacto</button>
+                    <button class="nav-btn" id="btn-contact" aria-label="Acerca de SQL Practice Simulator">Acerca de</button>
                 </div>
             </div>
 
@@ -115,19 +129,19 @@
             <!-- LEFT SIDEBAR -->
             <aside class="layout-left mobile-hide-panel" id="layout-left" role="complementary" aria-label="Panel de esquemas y documentación">
                 <div class="sidebar-section">
-                    <h2 class="section-title text-center">Base de Datos SQL</h2>
-                    <div class="section-subtitle text-center">Ver Esquema</div>
+                    <h2 class="section-title">Base de Datos SQL</h2>
+                    <div class="section-subtitle">Ver Esquema</div>
                     <ul class="schema-list" id="schema-list"></ul>
                 </div>
                 <div class="sidebar-section">
-                    <div class="section-title text-center section-title-toggle">
+                    <div class="section-title section-title-toggle">
                         <span>Pistas del Nivel</span>
                         <button class="nav-btn-mini" id="toggle-hints-btn" aria-label="Mostrar u Ocultar Pistas del Nivel">Mostrar</button>
                     </div>
                     <ul class="schema-list" id="resources-list" style="padding-left:10px; display:none;"></ul>
                 </div>
                 <div class="sidebar-section">
-                    <h2 class="section-title text-center">Enciclopedia SQL</h2>
+                    <h2 class="section-title">Enciclopedia SQL</h2>
                     <ul class="schema-list" id="docs-list" style="padding:4px;"></ul>
                 </div>
             </aside>
@@ -154,10 +168,16 @@
                     <div class="dnd-blocks-target" id="dnd-blocks-target" title="Suelta los bloques aquí"></div>
                 </div>
 
-                <div class="resizer" id="vertical-resizer" role="separator" aria-orientation="horizontal" aria-label="Ajustar la altura del editor"></div>
+                <div class="resizer" id="vertical-resizer" role="separator" aria-orientation="horizontal"
+                 tabindex="0" aria-label="Ajustar la altura del editor"
+                 aria-valuemin="100" aria-valuemax="600" aria-valuenow="0"
+                 title="Arrastra o usa las flechas arriba y abajo"></div>
                 
                 <!-- Results -->
-                <section class="results-panel" id="results-panel" aria-live="polite" aria-label="Resultados de la consulta SQL">
+                <section class="results-panel" id="results-panel" aria-label="Resultados de la consulta SQL">
+                    <!-- Announce the shape of the result, not the table: with
+                         aria-live on the panel, a 200-row result read row by row. -->
+                    <p class="visually-hidden" id="results-summary" role="status" aria-live="polite"></p>
                     <div class="placeholder-msg" id="results-placeholder">
                         <h2>Práctica SQL</h2>
                         <p>Los resultados de la consulta se muestran aquí.<br>Haz clic en el botón Ejecutar para probar tu código.</p>
@@ -170,9 +190,11 @@
 
             <!-- RIGHT SIDEBAR -->
             <aside class="layout-right mobile-hide-panel" id="layout-right" role="complementary" aria-label="Detalles de la misión e información de tablas">
-                <div class="mission-text" id="mission-briefing">
-                    Cargando misión...
-                </div>
+                <!-- El texto se inyecta en loadLevel(). El overlay de arranque cubre la
+                     app hasta entonces, así que aquí no hace falta un literal
+                     "Cargando misión..." que, si el arranque fallaba, se quedaba
+                     congelado para siempre. -->
+                <div class="mission-text" id="mission-briefing"></div>
                 
                 <div class="mission-actions">
                     <button class="nav-btn" id="btn-hint" aria-label="Obtener Pista para el nivel actual">Obtener Pista</button>
@@ -180,15 +202,13 @@
                 </div>
                 
                 <div class="sidebar-section">
-                    <h2 class="section-title text-center">Info. de Tabla</h2>
+                    <h2 class="section-title">Info. de Tabla</h2>
                     <div class="table-info-list" id="table-info-content"></div>
                 </div>
 
                 <div class="sidebar-section" id="expected-panel" style="display:none;">
-                    <h2 class="section-title text-center">Salida Esperada</h2>
+                    <h2 class="section-title">Salida Esperada</h2>
                     <table class="expected-table" id="expected-table"></table>
-                </div>
-
                 </div>
             </aside>
         </div>
@@ -219,7 +239,9 @@
     </div>
 
     <!-- ENCYCLOPEDIA FLOATING WINDOW -->
-    <div id="docs-window" class="retro-window hidden" role="dialog" aria-labelledby="docs-title">
+    <!-- aria-modal + backdrop: showDoc() moves focus in and Escape restores it. -->
+    <div id="docs-backdrop" class="retro-backdrop hidden"></div>
+    <div id="docs-window" class="retro-window hidden" role="dialog" aria-modal="true" aria-labelledby="docs-title" tabindex="-1">
         <div class="retro-window-header" id="docs-window-header">
             <span id="docs-title"><i class="ph-fill ph-book" aria-hidden="true"></i> Ayuda de SQL</span>
             <button class="retro-modal-close" id="docs-close" aria-label="Cerrar ventana de ayuda de SQL"><i class="ph ph-x" aria-hidden="true"></i></button>

@@ -49,14 +49,27 @@ export class App {
                 Storage.setItem(`sql_sim_code_${this.currentLevelIndex}`, code);
             }, 300);
         });
-        
+
         try {
+            this.bootStatus("Cargando las 25 misiones...");
             await this.loader.fetchAllLevels();
+
+            this.bootStatus("Cargando el motor SQLite en WebAssembly...");
             await this.db.init();
+
+            this.bootStatus("Preparando el nivel...");
             this.setupDBSelector();
             this.loadLevel(this.currentLevelIndex);
         } catch (e) {
             console.error("Error crítico en la inicialización:", e);
+            // Antes este catch solo escribía en consola: la app quedaba muerta
+            // con el literal "Cargando misión..." y el editor sin funcionar.
+            this.bootFail(
+                "No se pudo iniciar el simulador. Todos los niveles se ejecutan " +
+                "en tu navegador, así que hace falta conexión para descargar el motor la primera vez.",
+                e && e.message ? e.message : String(e)
+            );
+            return;
         }
 
         this.bindEvents();
@@ -67,6 +80,35 @@ export class App {
 
         const icon = document.querySelector('#btn-mute i');
         if (icon) icon.className = `ph-fill ${AudioFX.muted ? 'ph-speaker-x' : 'ph-speaker-high'}`;
+
+        this.bootDone();
+    }
+
+    bootStatus(msg) {
+        const el = document.getElementById("boot-status");
+        if (el) el.textContent = msg;
+    }
+
+    bootFail(hint, detail) {
+        const overlay = document.getElementById("boot-overlay");
+        const status = document.getElementById("boot-status");
+        const detailEl = document.getElementById("boot-detail");
+        const hintEl = document.getElementById("boot-hint");
+        if (status) status.textContent = "Error de arranque";
+        if (detailEl) {
+            detailEl.textContent = detail;
+            detailEl.classList.remove("hidden");
+        }
+        if (hintEl) hintEl.textContent = hint;
+        if (overlay) {
+            overlay.classList.remove("hidden");
+            overlay.setAttribute("role", "alert");
+        }
+    }
+
+    bootDone() {
+        const overlay = document.getElementById("boot-overlay");
+        if (overlay) overlay.classList.add("hidden");
     }
 
     setEditorQuiet(value) {
@@ -142,12 +184,24 @@ export class App {
         });
 
         document.getElementById("btn-hint")?.addEventListener("click", () => {
-            // Unhide hints list silently without modal window
+            // "Obtener Pista" solo revela (su rótulo lo dice); el toggle de la
+            // cabecera es el que oculta. Antes los dos controls se desincronizaban
+            // y el texto "Mostrar" podia quedar mintiendo sobre el estado real.
             const list = document.getElementById("resources-list");
             const btn = document.getElementById("toggle-hints-btn");
-            if (list) {
-                list.style.display = "block";
-                if (btn) btn.textContent = "Ocultar";
+            if (!list) return;
+            list.style.display = "block";
+            if (btn) btn.textContent = "Ocultar";
+            const summary = document.getElementById("results-summary");
+            if (summary) summary.textContent = "Pistas del nivel mostradas.";
+
+            // En móvil las pistas viven en el panel de Esquema, que está oculto
+            // desde la tab Misión. Sin este salto el botón no hace nada visible.
+            if (window.matchMedia('(max-width: 768px)').matches && this._switchMobileTab) {
+                this._switchMobileTab(
+                    document.getElementById("tab-btn-schema"),
+                    document.getElementById("layout-left")
+                );
             }
         });
 
@@ -184,20 +238,34 @@ export class App {
         });
 
         document.getElementById("btn-settings")?.addEventListener("click", () => {
+            // El autoguardado por nivel (sql_sim_code_N) también es progreso.
+            // No borrarlo dejaba respuestas viejas reapareciendo al volver a
+            // un nivel anterior, así que el botón prometía un reset que no era.
             this.showModal(
-                "Ajustes del Sistema", 
-                "¿Deseas formatear la base de datos local y reiniciar tu progreso al Nivel 1?", 
+                "Ajustes del Sistema",
+                "¿Deseas formatear la base de datos local y reiniciar tu progreso al Nivel 1? " +
+                "Se borrarán los logros y el código guardado de los 25 niveles.",
                 () => {
                     Storage.removeItem('sql_sim_level');
                     Storage.removeItem('sql_sim_achievements');
+                    this.loader.levels.forEach((_, i) => Storage.removeItem(`sql_sim_code_${i}`));
                     location.reload();
-                }, 
+                },
                 true
             );
         });
 
         document.getElementById("btn-contact")?.addEventListener("click", () => {
-            this.showModal("Acerca de", "SQL Practice Simulator v2.0\n\nDesarrollado para aprendizaje interactivo y dominio de bases de datos relacionales.", null, false);
+            // El botón decía "Contacto" y el modal decía "Acerca de". Ahora
+            // ambos dicen lo mismo; el texto aclara qué es cada cosa.
+            this.showModal(
+                "Acerca de",
+                "SQL Practice Simulator. Un entorno de práctica con 25 misiones para aprender " +
+                "SQL ejecutando consultas de verdad contra SQLite en WebAssembly, sin servidor y sin cuenta.\n\n" +
+                "Cada misión corre en tu navegador: nada de lo que escribas sale de tu equipo.",
+                null,
+                false
+            );
         });
 
         // Toggle Pistas del Nivel
@@ -221,7 +289,7 @@ export class App {
 
         if (!btnEditor || !btnSchema || !btnMission) return;
 
-        const switchTab = (activeBtn, showPanel) => {
+        this._switchMobileTab = (activeBtn, showPanel) => {
             [btnEditor, btnSchema, btnMission].forEach(b => b.classList.remove("active"));
             activeBtn.classList.add("active");
             activeBtn.setAttribute("aria-selected", "true");
@@ -239,9 +307,9 @@ export class App {
             showPanel.classList.add("mobile-show-panel");
         };
 
-        btnEditor.addEventListener("click", () => switchTab(btnEditor, midPanel));
-        btnSchema.addEventListener("click", () => switchTab(btnSchema, leftPanel));
-        btnMission.addEventListener("click", () => switchTab(btnMission, rightPanel));
+        btnEditor.addEventListener("click", () => this._switchMobileTab(btnEditor, midPanel));
+        btnSchema.addEventListener("click", () => this._switchMobileTab(btnSchema, leftPanel));
+        btnMission.addEventListener("click", () => this._switchMobileTab(btnMission, rightPanel));
 
         // Keyboard arrow navigation between tabs (mobile tab pattern)
         const tabs = [btnEditor, btnSchema, btnMission];
@@ -253,11 +321,11 @@ export class App {
                 else if (e.key === "ArrowLeft") next = (i - 1 + tabs.length) % tabs.length;
                 if (next !== null) {
                     e.preventDefault();
-                    switchTab(tabs[next], panels[next]);
+                    this._switchMobileTab(tabs[next], panels[next]);
                     tabs[next].focus();
                 } else if (e.key === "Home") {
                     e.preventDefault();
-                    switchTab(tabs[0], panels[0]);
+                    this._switchMobileTab(tabs[0], panels[0]);
                     tabs[0].focus();
                 }
             });
@@ -382,6 +450,38 @@ export class App {
 
         const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
 
+        const bounds = () => {
+            const parent = editor?.parentElement;
+            if (!parent) return null;
+            return { top: parent.getBoundingClientRect().top, height: parent.clientHeight };
+        };
+
+        const setHeight = (px) => {
+            const b = bounds();
+            if (!b) return;
+            const min = 100;
+            const max = Math.max(min, b.height - 180);
+            const newHeight = clamp(Math.round(px), min, max);
+            editor.style.flex = `0 0 ${newHeight}px`;
+            if (resizer) {
+                resizer.setAttribute('aria-valuenow', String(newHeight));
+                resizer.setAttribute('aria-valuemin', String(min));
+                resizer.setAttribute('aria-valuemax', String(Math.round(max)));
+            }
+            Storage.setItem('sql_sim_editor_height', String(newHeight));
+        };
+
+        const currentHeight = () => {
+            const b = bounds();
+            if (!b || !editor) return 0;
+            const explicit = parseInt(editor.style.flex, 10);
+            return Number.isFinite(explicit) && explicit > 0 ? explicit : editor.clientHeight;
+        };
+
+        // La preferencia de altura sobrevive al cambio de nivel y al tema.
+        const saved = parseInt(Storage.getItem('sql_sim_editor_height'), 10);
+        if (Number.isFinite(saved) && saved > 0) setHeight(saved);
+
         resizer?.addEventListener('mousedown', (e) => {
             e.preventDefault();
             isResizing = true;
@@ -390,15 +490,32 @@ export class App {
 
         document.addEventListener('mousemove', (e) => {
             if (!isResizing || !editor || !editor.parentElement) return;
-            const parentTop = editor.parentElement.getBoundingClientRect().top;
-            const parentHeight = editor.parentElement.clientHeight;
-            const newHeight = clamp(e.clientY - parentTop, 100, parentHeight - 280);
-            editor.style.flex = `0 0 ${newHeight}px`;
+            const b = bounds();
+            if (!b) return;
+            setHeight(e.clientY - b.top);
         });
 
         document.addEventListener('mouseup', () => {
             isResizing = false;
             document.body.style.cursor = 'default';
+        });
+
+        // role="separator" promete operacion con flechas. Sin esto era un
+        // control solo-raton que ademas anunciaba una capacidad inexistente.
+        resizer?.addEventListener('keydown', (e) => {
+            const STEP = 24;
+            const PAGE = 96;
+            let delta = 0;
+            if (e.key === 'ArrowUp') delta = -STEP;
+            else if (e.key === 'ArrowDown') delta = STEP;
+            else if (e.key === 'PageUp') delta = -PAGE;
+            else if (e.key === 'PageDown') delta = PAGE;
+            else if (e.key === 'Home') { e.preventDefault(); setHeight(100); return; }
+            else if (e.key === 'End') { e.preventDefault(); setHeight(1e9); return; }
+            else return;
+
+            e.preventDefault();
+            setHeight(currentHeight() + delta);
         });
     }
 
@@ -409,17 +526,25 @@ export class App {
         docsList.innerHTML = "";
         SqlDocs.forEach(cat => {
             const catLi = document.createElement("li");
-            catLi.innerHTML = `<div class="schema-table-name" style="color:var(--text-primary);"><i class="ph-fill ph-folder"></i> ${escapeHtml(cat.category)}</div>`;
+            catLi.innerHTML = `<div class="schema-table-name"><i class="ph-fill ph-folder" aria-hidden="true"></i> ${escapeHtml(cat.category)}</div>`;
             
             const itemList = document.createElement("ul");
-            itemList.className = "schema-list";
-            itemList.style.border = "none";
+            itemList.className = "schema-list schema-list-nested";
+            
             
             cat.items.forEach(item => {
                 const itemLi = document.createElement("li");
-                itemLi.className = "schema-column";
-                itemLi.innerHTML = `<i class="ph-fill ph-code"></i> ${escapeHtml(item.name)}`;
+                itemLi.className = "schema-column docs-item";
+                itemLi.setAttribute("role", "button");
+                itemLi.setAttribute("tabindex", "0");
+                itemLi.innerHTML = `<i class="ph-fill ph-code" aria-hidden="true"></i> ${escapeHtml(item.name)}`;
                 itemLi.onclick = () => this.winManager.showDoc(item);
+                itemLi.onkeydown = (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        this.winManager.showDoc(item);
+                    }
+                };
                 itemList.appendChild(itemLi);
             });
 
@@ -459,11 +584,11 @@ export class App {
         const briefing = document.getElementById("mission-briefing");
         if (briefing) {
             briefing.innerHTML = `
-                <h2 style="margin-bottom:8px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                <h2 class="mission-title">
                     <span>Misión ${index + 1}: ${escapeHtml(level.db_name || '')}</span>
                     ${badgeHTML}
                 </h2>
-                <p style="font-size:14px; line-height:1.5;">${escapeHtml(level.briefing_mision)}</p>
+                <p class="mission-text-body">${escapeHtml(level.briefing_mision)}</p>
             `;
         }
 
@@ -513,19 +638,27 @@ export class App {
         const list = document.getElementById("schema-list");
         if (!list) return;
         list.innerHTML = "";
-        if (!schema) return;
+        if (!schema || schema.length === 0) {
+            // Estado vacío explícito: antes salía temprano y dejaba un <ul>
+            // en blanco, sin nada que indicara que faltaba el esquema.
+            const empty = document.createElement("li");
+            empty.className = "sidebar-empty";
+            empty.textContent = "Este nivel no define tablas.";
+            list.appendChild(empty);
+            return;
+        }
         schema.forEach(tbl => {
             const li = document.createElement("li");
-            li.innerHTML = `<div class="schema-table-name"><i class="ph-fill ph-table"></i> ${escapeHtml(tbl.table)}</div>`;
+            li.innerHTML = `<div class="schema-table-name"><i class="ph-fill ph-table" aria-hidden="true"></i> ${escapeHtml(tbl.table)}</div>`;
             
             const colList = document.createElement("ul");
-            colList.className = "schema-list";
-            colList.style.border = "none";
+            colList.className = "schema-list schema-list-nested";
+            
             
             tbl.columns.forEach(col => {
                 const cli = document.createElement("li");
                 cli.className = "schema-column";
-                cli.innerHTML = `<i class="ph-fill ph-columns"></i> ${escapeHtml(col)}`;
+                cli.innerHTML = `<i class="ph-fill ph-columns" aria-hidden="true"></i> ${escapeHtml(col)}`;
                 colList.appendChild(cli);
             });
             
@@ -540,42 +673,32 @@ export class App {
         container.innerHTML = "";
 
         if (!schema || schema.length === 0) {
-            container.innerHTML = "<div style='padding:6px 8px; font-size:11px; color:var(--text-secondary);'>Sin tablas asignadas.</div>";
+            const empty = document.createElement("div");
+            empty.className = "sidebar-empty";
+            empty.textContent = "Sin tablas asignadas.";
+            container.appendChild(empty);
             return;
         }
 
         schema.forEach(tbl => {
             const card = document.createElement("div");
-            card.style.padding = "6px 8px";
-            card.style.borderBottom = "1px solid var(--border-shadow)";
-            card.style.fontSize = "12px";
+            card.className = "table-info-card";
 
             const tableName = document.createElement("div");
-            tableName.style.fontWeight = "bold";
-            tableName.style.color = "var(--text-primary)";
-            tableName.style.marginBottom = "3px";
-            tableName.innerHTML = `<i class="ph-fill ph-table"></i> Tabla: <span style="color:var(--text-primary); font-weight:bold;">${escapeHtml(tbl.table)}</span>`;
+            tableName.className = "table-info-name";
+            tableName.innerHTML = `<i class="ph-fill ph-table" aria-hidden="true"></i> Tabla: <span class="table-info-table">${escapeHtml(tbl.table)}</span>`;
 
             const colCount = document.createElement("div");
-            colCount.style.fontSize = "11px";
-            colCount.style.color = "var(--text-secondary)";
+            colCount.className = "table-info-count";
             colCount.textContent = `Total Columnas: ${tbl.columns ? tbl.columns.length : 0}`;
 
             const colBadgeWrapper = document.createElement("div");
-            colBadgeWrapper.style.marginTop = "4px";
-            colBadgeWrapper.style.display = "flex";
-            colBadgeWrapper.style.flexWrap = "wrap";
-            colBadgeWrapper.style.gap = "4px";
+            colBadgeWrapper.className = "column-badge-row";
 
             if (tbl.columns) {
                 tbl.columns.forEach(col => {
                     const badge = document.createElement("span");
-                    badge.style.background = "var(--bg-hover)";
-                    badge.style.border = "1px solid var(--border-shadow)";
-                    badge.style.padding = "1px 4px";
-                    badge.style.fontSize = "10px";
-                    badge.style.fontFamily = "var(--font-mono)";
-                    badge.style.color = "var(--text-primary)";
+                    badge.className = "column-badge";
                     badge.textContent = col;
                     colBadgeWrapper.appendChild(badge);
                 });
@@ -593,18 +716,23 @@ export class App {
         if (!list) return;
         list.innerHTML = "";
         if (!resources || resources.length === 0) {
-            list.innerHTML = "<li style='padding:6px; font-size:11px; color:var(--text-secondary);'>Sin pistas requeridas para este nivel.</li>";
+            const empty = document.createElement("li");
+            empty.className = "sidebar-empty";
+            empty.textContent = "Sin pistas requeridas para este nivel.";
+            list.appendChild(empty);
             return;
         }
         resources.forEach(res => {
             const li = document.createElement("li");
-            li.className = "schema-column";
-            li.style.flexDirection = "column";
-            li.style.alignItems = "flex-start";
-            li.innerHTML = `
-                <div style="font-weight:bold; margin-bottom:4px; color:var(--text-primary);"><i class="ph-fill ph-lightbulb"></i> ${escapeHtml(res.title)}</div>
-                <div style="font-size: 11px; line-height: 1.3; color:var(--text-secondary);">${escapeHtml(res.desc)}</div>
-            `;
+            li.className = "hint-item";
+            const title = document.createElement("div");
+            title.className = "hint-item-title";
+            title.innerHTML = `<i class="ph-fill ph-lightbulb" aria-hidden="true"></i> ${escapeHtml(res.title)}`;
+            const desc = document.createElement("div");
+            desc.className = "hint-item-desc";
+            desc.textContent = res.desc;
+            li.appendChild(title);
+            li.appendChild(desc);
             list.appendChild(li);
         });
     }
@@ -662,8 +790,15 @@ export class App {
             });
             AudioFX.success();
             this.achievements.unlock('detective'); // Unlock Achievement!
+            // El último nivel de auditoría no tenía siguiente: loadLevel(index+1) salía
+            // de rango y el botón Aceptar no hacía nada visible.
+            const isLast = this.currentLevelIndex >= this.loader.levels.length - 1;
             this.showModal("¡Auditoría Exitosa!", "¡Buen trabajo! Encontraste el error.\n\n" + level.explicacion, () => {
-                this.loadLevel(this.currentLevelIndex + 1);
+                if (isLast) {
+                    this.showModal("¡Felicidades!", "Has completado todos los niveles del simulador.", null, false);
+                } else {
+                    this.loadLevel(this.currentLevelIndex + 1);
+                }
             });
         } else {
             AudioFX.error();
@@ -678,7 +813,12 @@ export class App {
 
     runQuery() {
         const sql = this.editor.getValue();
-        if (!sql.trim()) return;
+        if (!sql.trim()) {
+            const summary = document.getElementById("results-summary");
+            if (summary) summary.textContent = "El editor está vacío. Escribe una consulta antes de ejecutar.";
+            this.showModal("Editor vacío", "Escribe una consulta en el editor antes de pulsar Ejecutar.", null, false);
+            return;
+        }
 
         // Ejecutar en transacción y revertir: cada "Ejecutar" evalúa contra la BD
         // prístina del nivel, así las consultas DML son idempotentes y la validación
@@ -695,7 +835,9 @@ export class App {
 
         if (res.error) {
             AudioFX.error();
-            this.renderResults({ columns: ["Error SQL"], values: [[res.error]] });
+            // Fila de error propia: antes renderizaba el mensaje como una fila
+            // de datos normal, indistinguible de un SELECT exitoso.
+            this.renderResults({ columns: ["Error SQL"], values: [[res.error]] }, { error: true });
             return;
         }
 
@@ -712,7 +854,7 @@ export class App {
         this.checkAnswer(res.results.values);
     }
 
-    renderResults(res) {
+    renderResults(res, opts = {}) {
         const placeholder = document.getElementById("results-placeholder");
         const contentWrapper = document.getElementById("results-content");
         if (placeholder) placeholder.style.display = "none";
@@ -728,8 +870,24 @@ export class App {
 
         const caption = document.createElement("caption");
         caption.className = "visually-hidden";
-        caption.textContent = "Resultados de tu consulta SQL";
+        caption.textContent = opts.error ? "Error de la consulta SQL" : "Resultados de tu consulta SQL";
         table.appendChild(caption);
+
+        if (opts.error) {
+            // Sin cabecera de columnas: un error no tiene columnas, y una fila
+            // roja bajo un "th" que dice "Error SQL" sigue pareciendo un dato.
+            const tbody = document.createElement("tbody");
+            const tr = document.createElement("tr");
+            tr.className = "error-row";
+            const td = document.createElement("td");
+            td.colSpan = 1;
+            td.textContent = allRows.length ? allRows[0][0] : 'Error desconocido';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            table.appendChild(tbody);
+            this.announceResults(0, 0, true);
+            return;
+        }
 
         const thead = document.createElement("thead");
         const trHead = document.createElement("tr");
@@ -754,6 +912,8 @@ export class App {
         });
         table.appendChild(tbody);
 
+        this.announceResults(allRows.length, res.columns.length, false);
+
         if (allRows.length > MAX_ROWS) {
             const noteRow = document.createElement("tr");
             noteRow.className = "truncation-note";
@@ -771,7 +931,7 @@ export class App {
         if (!table) return;
 
         if (!expectedData || expectedData.length === 0) {
-            table.innerHTML = "<tbody><tr><td style='padding:6px; font-size:11px; color:var(--text-secondary);'>No requiere salida estructurada.</td></tr></tbody>";
+            table.innerHTML = "<tbody><tr><td class='sidebar-empty'>No requiere salida estructurada.</td></tr></tbody>";
             if (panel) panel.style.display = "none";
             return;
         }
@@ -849,6 +1009,22 @@ export class App {
         return cols;
     }
 
+    announceResults(rowCount, colCount, isError) {
+        // La región viva vive fuera de la tabla: con aria-live en el panel,
+        // un resultado de 200 filas se leía fila a fila.
+        const summary = document.getElementById("results-summary");
+        if (!summary) return;
+        if (isError) {
+            summary.textContent = "La consulta tiene un error. Revisa el mensaje en el panel de resultados.";
+        } else if (rowCount === 0) {
+            summary.textContent = "La consulta se ejecutó y no devolvió filas.";
+        } else {
+            const cols = colCount === 1 ? "1 columna" : `${colCount} columnas`;
+            const rows = rowCount === 1 ? "1 fila" : `${rowCount} filas`;
+            summary.textContent = `La consulta devolvió ${rows} y ${cols}.`;
+        }
+    }
+
     clearResults() {
         const placeholder = document.getElementById("results-placeholder");
         const contentWrapper = document.getElementById("results-content");
@@ -856,6 +1032,8 @@ export class App {
         if (contentWrapper) contentWrapper.style.display = "none";
         const table = document.getElementById("results-table");
         if (table) table.innerHTML = "";
+        const summary = document.getElementById("results-summary");
+        if (summary) summary.textContent = "";
     }
 
     checkAnswer(actualData) {
